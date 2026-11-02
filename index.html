@@ -270,14 +270,14 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 
   <div class="title">
     <h1><span>BU</span>想<span style="background:var(--yellow);transform:rotate(2deg)">SAN</span>班</h1>
-    <p>釜山 4 人行・2026.11.18 – 11.22（5 天 4 夜）</p>
+    <p id="heroSub">釜山 4 人行・2026.11.18 – 11.22（5 天 4 夜）</p>
     <div class="crew" aria-label="成員"><b>B</b><b>C</b><b>H</b><b>K</b></div>
   </div>
 
   <div class="card count">
     <div class="lab" id="cdLabel">出發倒數</div>
     <div class="cd" id="cd"><div><strong>--</strong><small>天</small></div><div><strong>--</strong><small>時</small></div><div><strong>--</strong><small>分</small></div><div><strong>--</strong><small>秒</small></div></div>
-    <div class="note">11/18 凌晨 02:50 桃園起飛，所以 11/17 深夜就要出門囉</div>
+    <div class="note" id="depNote">11/18 凌晨 02:50 桃園起飛，所以前一天深夜就要出門囉</div>
   </div>
 </section>
 
@@ -312,7 +312,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
     <div class="card">
       <h3 style="margin-bottom:6px">B 的花費組成</h3>
       <div id="bars"></div>
-      <p class="hint">H、K 的住宿多 33,825 韓元（單人房較貴）。</p>
+      <p class="hint" id="lodgeHint"></p>
     </div>
   </div>
   <div class="card" style="margin-top:16px">
@@ -347,123 +347,751 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 <script>
 (function(){
 'use strict';
-const RATE = 40;
+const RATE = 40, PASS = 85000, PEOPLE = ['B','C','H','K'];
+
+/*DATA:START*/
+const DATA = {
+ "flights": [
+  {
+   "dir": "去程",
+   "dep": "2026-11-18T02:50:00",
+   "arr": "2026-11-18T06:10:00",
+   "from": "TPE",
+   "fromN": "臺灣桃園國際機場 T1",
+   "to": "PUS",
+   "toN": "金海國際機場 I",
+   "airline": "濟州航空",
+   "no": "7C6164",
+   "meta": [
+    "經濟艙",
+    "波音 737-800",
+    "無餐點"
+   ],
+   "note": "11/17 深夜就要出門"
+  },
+  {
+   "dir": "回程",
+   "dep": "2026-11-22T14:50:00",
+   "arr": "2026-11-22T16:30:00",
+   "from": "PUS",
+   "fromN": "金海國際機場 I",
+   "to": "TPE",
+   "toN": "臺灣桃園國際機場 T1",
+   "airline": "大韓航空",
+   "no": "KE2085",
+   "meta": [
+    "經濟艙",
+    "波音 737",
+    "含餐點"
+   ],
+   "note": ""
+  }
+ ],
+ "days": [
+  {
+   "label": "Day 1",
+   "date": "2026-11-18",
+   "theme": "抵達釜山・西面日",
+   "items": [
+    {
+     "t": "06:10",
+     "n": "抵達金海機場（7C6164）",
+     "tags": [],
+     "must": false,
+     "ko": "김해국제공항",
+     "note": "入境加領行李約 1 小時。紅眼班機，先開網路、上廁所。"
+    },
+    {
+     "t": "07:30",
+     "n": "輕軌＋地鐵到西面",
+     "tags": [
+      "地鐵"
+     ],
+     "must": false,
+     "ko": "서면역",
+     "note": "金海機場輕軌轉地鐵 2 號線到西面。行李多或太累可改搭大型計程車，4 人分攤。",
+     "cost": 2000,
+     "kind": "move"
+    },
+    {
+     "t": "08:30",
+     "n": "豬肉湯飯早餐",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "서면 돼지국밥골목",
+     "note": "下飛機的第一餐。西面有一整條豬肉湯飯街，進店前先看營業時間。",
+     "cost": 11000,
+     "kind": "food"
+    },
+    {
+     "t": "09:30",
+     "n": "寄放行李（bamboo:on）",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "부산진구 동성로61번길 32",
+     "note": "通常 15:00 才能入住，先請櫃檯寄放。飯店到西面的實際距離請用 Naver Map 確認。"
+    },
+    {
+     "t": "10:30",
+     "n": "逛西面＋Olive Young 初探",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "서면 올리브영",
+     "note": "先逛地下街，看 Olive Young 有哪些想買，正式採購排在 11/21 醫美之後。",
+     "cost": 30000,
+     "kind": "shop"
+    },
+    {
+     "t": "12:30",
+     "n": "西面小吃午餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 먹자골목",
+     "note": "早餐吃得多，午餐吃小吃就好。",
+     "cost": 8000,
+     "kind": "food"
+    },
+    {
+     "t": "14:30",
+     "n": "回飯店入住、補眠",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "부산진구 동성로61번길 32",
+     "note": "15:00 後入住，先睡一下，晚餐才有體力。"
+    },
+    {
+     "t": "18:00",
+     "n": "韓牛晚餐",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "서면 한우",
+     "note": "店家待選：挑 Naver Map 評分 4.0 以上並先訂位。預估每人約 6 萬韓元。",
+     "cost": 60000,
+     "kind": "food"
+    }
+   ]
+  },
+  {
+   "label": "Day 2",
+   "date": "2026-11-19",
+   "theme": "老城區日：釜山塔・札嘎其・甘川・松島",
+   "items": [
+    {
+     "t": "08:30",
+     "n": "早餐＋啟用釜山 Pass",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 카페",
+     "note": "Pass 從第一個景點開始算 48 小時，實際啟用規則出發前再確認。",
+     "cost": 7000,
+     "kind": "food"
+    },
+    {
+     "t": "10:00",
+     "n": "地鐵到南浦洞",
+     "tags": [
+      "地鐵"
+     ],
+     "must": false,
+     "ko": "남포역",
+     "note": "西面搭 1 號線到南浦。",
+     "cost": 1550,
+     "kind": "move"
+    },
+    {
+     "t": "10:30",
+     "n": "釜山塔（B 區）",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "부산타워",
+     "note": "在龍頭山公園上，順便逛南浦洞。",
+     "pass": 12000
+    },
+    {
+     "t": "12:00",
+     "n": "札嘎其市場海鮮午餐",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "자갈치시장",
+     "note": "附近吃海鮮。點之前先問價，生魚片和料理費要分清楚。",
+     "cost": 35000,
+     "kind": "food"
+    },
+    {
+     "t": "14:30",
+     "n": "甘川洞 Flipbook Studio 手翻書（B 區，需 2 張 Pass）",
+     "tags": [
+      "計程車"
+     ],
+     "must": true,
+     "ko": "플립북 스튜디오 부산 감천",
+     "note": "札嘎其搭計程車過去，4 人分攤。這個景點要用 2 張 Pass。",
+     "cost": 5000,
+     "kind": "move",
+     "pass": 15000
+    },
+    {
+     "t": "15:30",
+     "n": "甘川文化村散步",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "감천문화마을",
+     "note": "彩色小屋拍照，坡道多，穿好走的鞋。"
+    },
+    {
+     "t": "16:30",
+     "n": "松島海上纜車（B 區）",
+     "tags": [
+      "計程車"
+     ],
+     "must": true,
+     "ko": "송도해상케이블카",
+     "note": "甘川洞搭計程車過去，傍晚看海。",
+     "cost": 5000,
+     "kind": "move",
+     "pass": 24000
+    },
+    {
+     "t": "18:00",
+     "n": "松島海邊散步＋晚餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "송도해수욕장",
+     "note": "天黑前在海邊走走，再找附近的店吃晚餐。",
+     "cost": 15000,
+     "kind": "food"
+    },
+    {
+     "t": "19:30",
+     "n": "計程車回西面",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "서면역",
+     "note": "松島到西面距離遠，4 人分攤計程車。",
+     "cost": 10000,
+     "kind": "move"
+    }
+   ]
+  },
+  {
+   "label": "Day 3",
+   "date": "2026-11-20",
+   "theme": "海雲台日：機張・海雲台・好市多",
+   "items": [
+    {
+     "t": "08:30",
+     "n": "早餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 카페",
+     "note": "",
+     "cost": 7000,
+     "kind": "food"
+    },
+    {
+     "t": "09:30",
+     "n": "計程車到機張",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "스카이라인 루지 부산",
+     "note": "西面到機張較遠，4 人搭大型計程車分攤。",
+     "cost": 11000,
+     "kind": "move"
+    },
+    {
+     "t": "10:30",
+     "n": "Skyline Luge 釜山（A 區）",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "스카이라인 루지 부산",
+     "note": "滑道刺激又好玩，記得先看營業時間。",
+     "pass": 34000
+    },
+    {
+     "t": "12:30",
+     "n": "機張午餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "기장 맛집",
+     "note": "在 Naver Map 選附近評分高的店。",
+     "cost": 15000,
+     "kind": "food"
+    },
+    {
+     "t": "14:00",
+     "n": "計程車到海雲台",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "부산 엑스 더 스카이",
+     "note": "",
+     "cost": 6000,
+     "kind": "move"
+    },
+    {
+     "t": "14:30",
+     "n": "Busan X the SKY（A 區）",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "부산 엑스 더 스카이",
+     "note": "海雲台 LCT 大樓的展望台，看海景和城市。",
+     "pass": 29000
+    },
+    {
+     "t": "16:00",
+     "n": "海雲台海岸列車（B 區）",
+     "tags": [
+      "計程車"
+     ],
+     "must": true,
+     "ko": "해운대 해변열차",
+     "note": "從海雲台搭計程車到乘車處，沿海看風景。",
+     "cost": 3000,
+     "kind": "move",
+     "pass": 16000
+    },
+    {
+     "t": "17:30",
+     "n": "海雲台海邊漫步＋咖啡",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "해운대해수욕장",
+     "note": "看日落、沿海邊慢慢走。",
+     "cost": 6000,
+     "kind": "food"
+    },
+    {
+     "t": "18:30",
+     "n": "海雲台晚餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "해운대 맛집",
+     "note": "店家待選。",
+     "cost": 25000,
+     "kind": "food"
+    },
+    {
+     "t": "20:00",
+     "n": "計程車到反山好市多",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "코스트코 반여",
+     "note": "",
+     "cost": 2000,
+     "kind": "move"
+    },
+    {
+     "t": "20:15",
+     "n": "好市多購物（反山）",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "코스트코 반여",
+     "note": "需帶會員卡。好市多通常每月第 2、4 個週日公休，11/22 剛好是第 4 個週日，所以排在 11/20。出發前確認營業時間。",
+     "cost": 50000,
+     "kind": "shop"
+    },
+    {
+     "t": "21:30",
+     "n": "計程車回西面",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "서면역",
+     "note": "",
+     "cost": 3000,
+     "kind": "move"
+    }
+   ]
+  },
+  {
+   "label": "Day 4",
+   "date": "2026-11-21",
+   "theme": "廣安里＋醫美日（全程計程車）",
+   "items": [
+    {
+     "t": "08:00",
+     "n": "早餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 카페",
+     "note": "",
+     "cost": 7000,
+     "kind": "food"
+    },
+    {
+     "t": "09:30",
+     "n": "退房 bamboo:on，到東橫INN寄放行李",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "토요코인 부산서면",
+     "note": "東橫INN 通常 15:00 才能入住，先寄放行李。今天全程搭計程車。",
+     "cost": 2000,
+     "kind": "move"
+    },
+    {
+     "t": "10:30",
+     "n": "計程車到廣安里",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "광안리해수욕장",
+     "note": "",
+     "cost": 3500,
+     "kind": "move"
+    },
+    {
+     "t": "11:00",
+     "n": "廣安里海邊漫步＋廣安大橋咖啡",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "광안리해수욕장",
+     "note": "沿海走走，找看得到廣安大橋的咖啡店。",
+     "cost": 8000,
+     "kind": "food"
+    },
+    {
+     "t": "12:30",
+     "n": "廣安里午餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "광안리 맛집",
+     "note": "醫美前吃得清爽一點。",
+     "cost": 15000,
+     "kind": "food"
+    },
+    {
+     "t": "13:30",
+     "n": "計程車到醫美診所",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "",
+     "note": "診所地址確定後，把名稱填進 Notion「韓文店名/地名」就會有地圖連結。",
+     "cost": 3500,
+     "kind": "move"
+    },
+    {
+     "t": "14:30",
+     "n": "醫美行程（診所與時間待填）",
+     "tags": [
+      "計程車"
+     ],
+     "must": true,
+     "ko": "",
+     "note": "全程搭計程車。術後依診所指示，避免汗蒸、高溫和劇烈活動，所以汗蒸幕放在備案。",
+     "special": "醫美費用另計，待填"
+    },
+    {
+     "t": "17:30",
+     "n": "計程車到東橫INN入住",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "토요코인 부산서면",
+     "note": "取回寄放的行李、辦理入住。",
+     "cost": 3000,
+     "kind": "move"
+    },
+    {
+     "t": "18:30",
+     "n": "西面 Olive Young 正式採購",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "서면 올리브영",
+     "note": "護膚品排在醫美之後買，可以問診所術後建議用什麼。",
+     "cost": 70000,
+     "kind": "shop"
+    },
+    {
+     "t": "19:30",
+     "n": "晚餐（清淡為主）",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 맛집",
+     "note": "視術後狀況決定。",
+     "cost": 15000,
+     "kind": "food"
+    }
+   ]
+  },
+  {
+   "label": "Day 5",
+   "date": "2026-11-22",
+   "theme": "返程日",
+   "items": [
+    {
+     "t": "08:00",
+     "n": "早餐",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 카페",
+     "note": "東橫INN 是否附早餐以訂單為準。",
+     "cost": 7000,
+     "kind": "food"
+    },
+    {
+     "t": "09:30",
+     "n": "退房，最後補貨（Olive Young／Daiso）",
+     "tags": [
+      "步行"
+     ],
+     "must": false,
+     "ko": "서면 올리브영",
+     "note": "店家多半 10 點左右開門，沒買完的在這裡補。10:45 就要出發。"
+    },
+    {
+     "t": "10:45",
+     "n": "計程車到金海機場",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
+     "ko": "김해국제공항",
+     "note": "4 人搭大型計程車分攤。",
+     "cost": 10000,
+     "kind": "move"
+    },
+    {
+     "t": "11:45",
+     "n": "辦理登機（KE2085）",
+     "tags": [],
+     "must": false,
+     "ko": "김해국제공항",
+     "note": "14:50 起飛，建議 3 小時前到。"
+    },
+    {
+     "t": "14:50",
+     "n": "KE2085 起飛，16:30 抵達桃園 T1",
+     "tags": [],
+     "must": false,
+     "ko": "",
+     "note": "航班含餐點。時間皆為當地時間。"
+    }
+   ]
+  }
+ ],
+ "backups": [
+  {
+   "n": "Spa Land 汗蒸幕（A 區）",
+   "ko": "스파랜드 센텀시티",
+   "price": 26000,
+   "note": "有空檔才去（例如 11/20 晚上取代好市多）。不建議排在醫美之後。"
+  },
+  {
+   "n": "釜山鑽石灣遊艇（A 區，需預約）",
+   "ko": "광안리 요트",
+   "price": 30000,
+   "note": "可排在 11/21 上午的廣安里，需先預約。"
+  },
+  {
+   "n": "釜山觀光旅遊巴士（A 區）",
+   "ko": "부산시티투어버스",
+   "price": 20000,
+   "note": "從釜山站出發，行程已滿，目前沒排。"
+  }
+ ],
+ "todos": [
+  {
+   "t": "確認護照效期（建議 6 個月以上）",
+   "c": "證件",
+   "d": "2026-11-05"
+  },
+  {
+   "t": "確認韓國入境規定（K-ETA、入境申報等）",
+   "c": "證件",
+   "d": "2026-11-10"
+  },
+  {
+   "t": "預約 11/21 下午醫美（診所名稱、時間、費用填回行程表）",
+   "c": "預約/訂位",
+   "d": "2026-11-08"
+  },
+  {
+   "t": "購買釜山 Pass 48HR × 4 張（每張原價 85,000 韓元）",
+   "c": "預約/訂位",
+   "d": "2026-11-14",
+   "n": "Flipbook Studio 需兩張 Pass；啟用與 48 小時計算方式要再確認"
+  },
+  {
+   "t": "（選擇性）預約鑽石灣遊艇",
+   "c": "預約/訂位",
+   "n": "備案景點，需預約"
+  },
+  {
+   "t": "買好 eSIM 或網卡",
+   "c": "網路/eSIM",
+   "d": "2026-11-14"
+  },
+  {
+   "t": "換韓元（試算匯率 1 台幣＝40 韓元）",
+   "c": "錢/信用卡",
+   "d": "2026-11-16"
+  },
+  {
+   "t": "確認信用卡海外手續費與計程車付款方式",
+   "c": "錢/信用卡"
+  },
+  {
+   "t": "下載 Naver Map、Papago、Kakao T",
+   "c": "網路/eSIM",
+   "d": "2026-11-16"
+  },
+  {
+   "t": "準備好市多會員卡與環保購物袋",
+   "c": "行李"
+  },
+  {
+   "t": "確認兩家航空的行李額度（濟州航空無餐點）",
+   "c": "行李",
+   "d": "2026-11-12"
+  },
+  {
+   "t": "11/17 深夜出門，約 00:00 前到桃園機場 T1",
+   "c": "其他",
+   "d": "2026-11-17",
+   "n": "7C6164 是 11/18 凌晨 02:50 起飛"
+  }
+ ],
+ "stays": [
+  {
+   "name": "bamboo:on",
+   "inD": "2026-11-18",
+   "outD": "2026-11-21",
+   "addr": "32, Dongseong-ro 61beon-gil, Busanjin-gu, Busan, Republic of Korea 47302",
+   "ko": "부산진구 동성로61번길 32",
+   "price": "總價 11,589 台幣（4 人平分，每人約 2,897 台幣＝115,890 韓元）",
+   "note": "3 晚｜B、C、H、K 同住（房型待確認）｜11/18 早上先寄放行李",
+   "share": {
+    "B": 115890,
+    "C": 115890,
+    "H": 115890,
+    "K": 115890
+   }
+  },
+  {
+   "name": "東橫INN 釜山西面",
+   "inD": "2026-11-21",
+   "outD": "2026-11-22",
+   "addr": "39 Seojeon-ro, Busanjin District, Busan, 南韓",
+   "ko": "토요코인 부산서면",
+   "price": "雙人房 88,350 韓元（B、C 平分，各 44,175）；單人房 78,000 韓元（H）；單人房 78,000 韓元（K）",
+   "note": "1 晚｜11/21 上午先寄放行李，醫美結束後入住",
+   "share": {
+    "B": 44175,
+    "C": 44175,
+    "H": 78000,
+    "K": 78000
+   }
+  }
+ ]
+};
+/*DATA:END*/
+
+const $ = s => document.querySelector(s);
 const fmt = n => Math.round(n).toLocaleString('en-US');
 const twd = k => Math.round(k / RATE);
 const navUrl = q => 'https://map.naver.com/p/search/' + encodeURIComponent(q);
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const $ = s => document.querySelector(s);
-
-/* ---------- 資料（與 Notion 同步） ---------- */
-const FLIGHTS = [
-  {dir:'去程', date:'2026.11.18（三）', from:'TPE', to:'PUS', dep:'02:50', arr:'06:10',
-   fromN:'臺灣桃園國際機場 T1', toN:'金海國際機場 I', airline:'濟州航空', no:'7C6164',
-   meta:['經濟艙','波音 737-800','無餐點'], note:'11/17 深夜就要出門'},
-  {dir:'回程', date:'2026.11.22（日）', from:'PUS', to:'TPE', dep:'14:50', arr:'16:30',
-   fromN:'金海國際機場 I', toN:'臺灣桃園國際機場 T1', airline:'大韓航空', no:'KE2085',
-   meta:['經濟艙','波音 737','含餐點'], note:''}
-];
-
-const DAYS = [
- {label:'Day 1', date:'11/18', wd:'三', theme:'抵達釜山・西面日', items:[
-  {t:'06:10', n:'抵達金海機場（7C6164）', tags:[], ko:'김해국제공항', note:'入境加領行李約 1 小時。紅眼班機，先開網路、上廁所。'},
-  {t:'07:30', n:'輕軌＋地鐵到西面', tags:['地鐵'], ko:'서면역', note:'金海機場輕軌轉地鐵 2 號線到西面。行李多或太累可改搭大型計程車，4 人分攤。', cost:2000, kind:'move'},
-  {t:'08:30', n:'豬肉湯飯早餐', tags:['步行'], must:1, ko:'서면 돼지국밥골목', note:'下飛機的第一餐。西面有一整條豬肉湯飯街，進店前先看營業時間。', cost:11000, kind:'food'},
-  {t:'09:30', n:'寄放行李（bamboo:on）', tags:['步行'], ko:'부산진구 동성로61번길 32', note:'通常 15:00 才能入住，先請櫃檯寄放。飯店到西面的實際距離請用 Naver Map 確認。'},
-  {t:'10:30', n:'逛西面＋Olive Young 初探', tags:['步行'], must:1, ko:'서면 올리브영', note:'先逛地下街，看 Olive Young 有哪些想買，正式採購排在 11/21 醫美之後。', cost:30000, kind:'shop'},
-  {t:'12:30', n:'西面小吃午餐', tags:['步行'], ko:'서면 먹자골목', note:'早餐吃得多，午餐吃小吃就好。', cost:8000, kind:'food'},
-  {t:'14:30', n:'回飯店入住、補眠', tags:['步行'], ko:'부산진구 동성로61번길 32', note:'15:00 後入住，先睡一下，晚餐才有體力。'},
-  {t:'18:00', n:'韓牛晚餐', tags:['步行'], must:1, ko:'서면 한우', note:'店家待選：挑 Naver Map 評分 4.0 以上並先訂位。預估每人約 6 萬韓元。', cost:60000, kind:'food'}
- ]},
- {label:'Day 2', date:'11/19', wd:'四', theme:'老城區日：釜山塔・札嘎其・甘川・松島', items:[
-  {t:'08:30', n:'早餐＋啟用釜山 Pass', tags:['步行'], ko:'서면 카페', note:'Pass 從第一個景點開始算 48 小時，實際啟用規則出發前再確認。', cost:7000, kind:'food'},
-  {t:'10:00', n:'地鐵到南浦洞', tags:['地鐵'], ko:'남포역', note:'西面搭 1 號線到南浦。', cost:1550, kind:'move'},
-  {t:'10:30', n:'釜山塔（B 區）', tags:['步行'], must:1, ko:'부산타워', note:'在龍頭山公園上，順便逛南浦洞。', pass:12000},
-  {t:'12:00', n:'札嘎其市場海鮮午餐', tags:['步行'], must:1, ko:'자갈치시장', note:'附近吃海鮮。點之前先問價，生魚片和料理費要分清楚。', cost:35000, kind:'food'},
-  {t:'14:30', n:'甘川洞 Flipbook Studio 手翻書（B 區，需 2 張 Pass）', tags:['計程車'], must:1, ko:'플립북 스튜디오 부산 감천', note:'札嘎其搭計程車過去，4 人分攤。這個景點要用 2 張 Pass。', cost:5000, kind:'move', pass:15000},
-  {t:'15:30', n:'甘川文化村散步', tags:['步行'], ko:'감천문화마을', note:'彩色小屋拍照，坡道多，穿好走的鞋。'},
-  {t:'16:30', n:'松島海上纜車（B 區）', tags:['計程車'], must:1, ko:'송도해상케이블카', note:'甘川洞搭計程車過去，傍晚看海。', cost:5000, kind:'move', pass:24000},
-  {t:'18:00', n:'松島海邊散步＋晚餐', tags:['步行'], ko:'송도해수욕장', note:'天黑前在海邊走走，再找附近的店吃晚餐。', cost:15000, kind:'food'},
-  {t:'19:30', n:'計程車回西面', tags:['計程車'], ko:'서면역', note:'松島到西面距離遠，4 人分攤計程車。', cost:10000, kind:'move'}
- ]},
- {label:'Day 3', date:'11/20', wd:'五', theme:'海雲台日：機張・海雲台・好市多', items:[
-  {t:'08:30', n:'早餐', tags:['步行'], ko:'서면 카페', note:'', cost:7000, kind:'food'},
-  {t:'09:30', n:'計程車到機張', tags:['計程車'], ko:'스카이라인 루지 부산', note:'西面到機張較遠，4 人搭大型計程車分攤。', cost:11000, kind:'move'},
-  {t:'10:30', n:'Skyline Luge 釜山（A 區）', tags:['步行'], must:1, ko:'스카이라인 루지 부산', note:'滑道刺激又好玩，記得先看營業時間。', pass:34000},
-  {t:'12:30', n:'機張午餐', tags:['步行'], ko:'기장 맛집', note:'在 Naver Map 選附近評分高的店。', cost:15000, kind:'food'},
-  {t:'14:00', n:'計程車到海雲台', tags:['計程車'], ko:'부산 엑스 더 스카이', note:'', cost:6000, kind:'move'},
-  {t:'14:30', n:'Busan X the SKY（A 區）', tags:['步行'], must:1, ko:'부산 엑스 더 스카이', note:'海雲台 LCT 大樓的展望台，看海景和城市。', pass:29000},
-  {t:'16:00', n:'海雲台海岸列車（B 區）', tags:['計程車'], must:1, ko:'해운대 해변열차', note:'從海雲台搭計程車到乘車處，沿海看風景。', cost:3000, kind:'move', pass:16000},
-  {t:'17:30', n:'海雲台海邊漫步＋咖啡', tags:['步行'], must:1, ko:'해운대해수욕장', note:'看日落、沿海邊慢慢走。', cost:6000, kind:'food'},
-  {t:'18:30', n:'海雲台晚餐', tags:['步行'], ko:'해운대 맛집', note:'店家待選。', cost:25000, kind:'food'},
-  {t:'20:00', n:'計程車到反山好市多', tags:['計程車'], ko:'코스트코 반여', note:'', cost:2000, kind:'move'},
-  {t:'20:15', n:'好市多購物（反山）', tags:['步行'], must:1, ko:'코스트코 반여', note:'需帶會員卡。好市多通常每月第 2、4 個週日公休，11/22 剛好是第 4 個週日，所以排在 11/20。出發前確認營業時間。', cost:50000, kind:'shop'},
-  {t:'21:30', n:'計程車回西面', tags:['計程車'], ko:'서면역', note:'', cost:3000, kind:'move'}
- ]},
- {label:'Day 4', date:'11/21', wd:'六', theme:'廣安里＋醫美日（全程計程車）', items:[
-  {t:'08:00', n:'早餐', tags:['步行'], ko:'서면 카페', note:'', cost:7000, kind:'food'},
-  {t:'09:30', n:'退房 bamboo:on，到東橫INN寄放行李', tags:['計程車'], ko:'토요코인 부산서면', note:'東橫INN 通常 15:00 才能入住，先寄放行李。今天全程搭計程車。', cost:2000, kind:'move'},
-  {t:'10:30', n:'計程車到廣安里', tags:['計程車'], ko:'광안리해수욕장', note:'', cost:3500, kind:'move'},
-  {t:'11:00', n:'廣安里海邊漫步＋廣安大橋咖啡', tags:['步行'], must:1, ko:'광안리해수욕장', note:'沿海走走，找看得到廣安大橋的咖啡店。', cost:8000, kind:'food'},
-  {t:'12:30', n:'廣安里午餐', tags:['步行'], ko:'광안리 맛집', note:'醫美前吃得清爽一點。', cost:15000, kind:'food'},
-  {t:'13:30', n:'計程車到醫美診所', tags:['計程車'], ko:'', note:'診所地址確定後，把名稱填進 Notion「韓文店名/地名」就會有地圖連結。', cost:3500, kind:'move'},
-  {t:'14:30', n:'醫美行程（診所與時間待填）', tags:['計程車'], must:1, ko:'', note:'全程搭計程車。術後依診所指示，避免汗蒸、高溫和劇烈活動，所以汗蒸幕放在備案。', special:'醫美費用另計，待填'},
-  {t:'17:30', n:'計程車到東橫INN入住', tags:['計程車'], ko:'토요코인 부산서면', note:'取回寄放的行李、辦理入住。', cost:3000, kind:'move'},
-  {t:'18:30', n:'西面 Olive Young 正式採購', tags:['步行'], must:1, ko:'서면 올리브영', note:'護膚品排在醫美之後買，可以問診所術後建議用什麼。', cost:70000, kind:'shop'},
-  {t:'19:30', n:'晚餐（清淡為主）', tags:['步行'], ko:'서면 맛집', note:'視術後狀況決定。', cost:15000, kind:'food'}
- ]},
- {label:'Day 5', date:'11/22', wd:'日', theme:'返程日', items:[
-  {t:'08:00', n:'早餐', tags:['步行'], ko:'서면 카페', note:'東橫INN 是否附早餐以訂單為準。', cost:7000, kind:'food'},
-  {t:'09:30', n:'退房，最後補貨（Olive Young／Daiso）', tags:['步行'], ko:'서면 올리브영', note:'店家多半 10 點左右開門，沒買完的在這裡補。10:45 就要出發。'},
-  {t:'10:45', n:'計程車到金海機場', tags:['計程車'], ko:'김해국제공항', note:'4 人搭大型計程車分攤。', cost:10000, kind:'move'},
-  {t:'11:45', n:'辦理登機（KE2085）', tags:[], ko:'김해국제공항', note:'14:50 起飛，建議 3 小時前到。'},
-  {t:'14:50', n:'KE2085 起飛，16:30 抵達桃園 T1', tags:[], ko:'', note:'航班含餐點。時間皆為當地時間。'}
- ]}
-];
-
-const BACKUPS = [
-  {n:'Spa Land 汗蒸幕（A 區）', ko:'스파랜드 센텀시티', price:26000, note:'有空檔才去（例如 11/20 晚上取代好市多）。不建議排在醫美之後。'},
-  {n:'釜山鑽石灣遊艇（A 區，需預約）', ko:'광안리 요트', price:30000, note:'可排在 11/21 上午的廣安里，需先預約。'},
-  {n:'釜山觀光旅遊巴士（A 區）', ko:'부산시티투어버스', price:20000, note:'從釜山站出發，行程已滿，目前沒排。'}
-];
-
-const TODOS = [
-  {t:'確認護照效期（建議 6 個月以上）', c:'證件', d:'11/05'},
-  {t:'確認韓國入境規定（K-ETA、入境申報等）', c:'證件', d:'11/10'},
-  {t:'預約 11/21 下午醫美（診所名稱、時間、費用填回行程表）', c:'預約/訂位', d:'11/08'},
-  {t:'購買釜山 Pass 48HR × 4 張（每張原價 85,000 韓元）', c:'預約/訂位', d:'11/14', n:'Flipbook Studio 需兩張 Pass；啟用與 48 小時計算方式要再確認'},
-  {t:'（選擇性）預約鑽石灣遊艇', c:'預約/訂位', n:'備案景點，需預約'},
-  {t:'買好 eSIM 或網卡', c:'網路/eSIM', d:'11/14'},
-  {t:'換韓元（試算匯率 1 台幣＝40 韓元）', c:'錢/信用卡', d:'11/16'},
-  {t:'確認信用卡海外手續費與計程車付款方式', c:'錢/信用卡'},
-  {t:'下載 Naver Map、Papago、Kakao T', c:'網路/eSIM', d:'11/16'},
-  {t:'準備好市多會員卡與環保購物袋', c:'行李'},
-  {t:'確認兩家航空的行李額度（濟州航空無餐點）', c:'行李', d:'11/12'},
-  {t:'11/17 深夜出門，約 00:00 前到桃園機場 T1', c:'其他', d:'11/17', n:'7C6164 是 11/18 凌晨 02:50 起飛'}
-];
-
-const STAYS = [
-  {name:'bamboo:on', nights:'3 晚', inD:'11/18（三）', outD:'11/21（六）', who:'B、C、H、K', addr:'32, Dongseong-ro 61beon-gil, Busanjin-gu, Busan, Republic of Korea 47302',
-   ko:'부산진구 동성로61번길 32', color:'var(--yellow)',
-   price:[['總價','11,589 台幣'],['每人（4 人平分）','2,897 台幣＝115,890 韓元']], note:'11/18 早上先寄放行李，15:00 後入住。'},
-  {name:'東橫INN 釜山西面', nights:'1 晚', inD:'11/21（六）', outD:'11/22（日）', who:'B+C 雙人房、H 單人房、K 單人房', addr:'39 Seojeon-ro, Busanjin District, Busan, 南韓',
-   ko:'토요코인 부산서면', color:'var(--green)',
-   price:[['雙人房（B、C）','88,350 韓元，各 44,175'],['單人房（H）','78,000 韓元'],['單人房（K）','78,000 韓元']], note:'11/21 上午先寄放行李，醫美結束後入住。'}
-];
-
-/* ---------- 工具 ---------- */
+const WD = ['日','一','二','三','四','五','六'];
+const wd = iso => { const [y,m,d] = iso.slice(0,10).split('-').map(Number); return WD[new Date(Date.UTC(y,m-1,d)).getUTCDay()]; };
+const md = iso => iso.slice(5,7) + '/' + iso.slice(8,10);
+const hm = iso => iso.slice(11,16);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const TAGCLS = {'地鐵':'t-blue','計程車':'t-yellow','步行':'t-green','公車':'t-coral'};
+const DAYCOL = ['var(--coral)','var(--yellow)','var(--blue)','var(--green)'];
+
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1800)}
-function mapBtn(ko){return ko?`<a class="map" href="${navUrl(ko)}" target="_blank" rel="noopener">📍 Naver Map</a>`:`<span class="map off">📍 地點待填</span>`}
+function mapBtn(ko, must){
+  if(ko) return `<a class="map" href="${navUrl(ko)}" target="_blank" rel="noopener">📍 Naver Map</a>`;
+  return must ? `<span class="map off">📍 地點待填</span>` : '';
+}
 function safeGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
 function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
-/* ---------- 倒數 ---------- */
-const DEP = new Date('2026-11-18T02:50:00+08:00');
-const RET = new Date('2026-11-22T16:30:00+08:00');
+const flights = (DATA.flights||[]).slice().sort((a,b)=>a.dep<b.dep?-1:1);
+const days = DATA.days||[];
+const items = days.flatMap(d=>d.items);
+
+/* ---------- 首頁 ---------- */
+function renderHero(){
+  const f0 = flights[0], fl = flights[flights.length-1];
+  const d0 = days.length ? days[0].date : (f0 && f0.dep.slice(0,10));
+  const d1 = days.length ? days[days.length-1].date : (fl && fl.arr.slice(0,10));
+  if(d0 && d1){
+    const n = days.length || Math.round((new Date(d1)-new Date(d0))/86400000)+1;
+    $('#heroSub').textContent = `釜山 4 人行・${d0.slice(0,4)}.${d0.slice(5,7)}.${d0.slice(8,10)} – ${d1.slice(5,7)}.${d1.slice(8,10)}（${n} 天 ${n-1} 夜）`;
+  }
+  if(f0){
+    const early = +f0.dep.slice(11,13) < 5;
+    $('#depNote').textContent = `${md(f0.dep)} ${hm(f0.dep)} ${f0.from==='TPE'?'桃園':f0.from}起飛` + (early ? '，所以前一天深夜就要出門囉' : '');
+  }
+}
 function tick(){
+  const f0 = flights[0], fl = flights[flights.length-1]; if(!f0) return;
+  const DEP = new Date(f0.dep + '+08:00'), RET = new Date(fl.arr + '+08:00');
   const now = new Date(), lab = $('#cdLabel'), cd = $('#cd');
-  const set = (a)=>{cd.querySelectorAll('strong').forEach((s,i)=>s.textContent=a[i])};
+  const set = a => cd.querySelectorAll('strong').forEach((s,i)=>s.textContent=a[i]);
   if(now < DEP){
     let s = Math.floor((DEP - now)/1000);
     const d = Math.floor(s/86400); s%=86400;
@@ -471,31 +1099,32 @@ function tick(){
     const m = Math.floor(s/60); s%=60;
     lab.textContent = '出發倒數'; set([d,String(h).padStart(2,'0'),String(m).padStart(2,'0'),String(s).padStart(2,'0')]);
   } else if(now < RET){
-    const day = Math.min(5, Math.floor((now - DEP)/86400000)+1);
+    const day = Math.min(days.length||5, Math.floor((now - DEP)/86400000)+1);
     lab.textContent = '旅途中，今天是第 '+day+' 天'; set(['✈','🌊','🍖','🛍']);
   } else {
     lab.textContent = '平安回家，下次再出發'; set(['♡','♡','♡','♡']);
   }
 }
-tick(); setInterval(tick,1000);
 
 /* ---------- 航班 ---------- */
-$('#flightList').innerHTML = FLIGHTS.map((f,i)=>`
+function renderFlights(){
+  $('#flightList').innerHTML = flights.map((f,i)=>`
   <article class="card flight">
-    <div class="top"><span class="chip" style="background:${i?'var(--green)':'var(--coral)'}">${f.dir}</span><span>${f.date}</span></div>
+    <div class="top"><span class="chip" style="background:${i%2?'var(--green)':'var(--coral)'}">${esc(f.dir)}</span><span>${f.dep.slice(0,4)}.${f.dep.slice(5,7)}.${f.dep.slice(8,10)}（${wd(f.dep)}）</span></div>
     <div class="route">
-      <div><div class="code">${f.from}</div><div class="time">${f.dep}</div><div class="ap">${f.fromN}</div></div>
-      <svg class="plane" viewBox="0 0 64 48" aria-hidden="true" style="${i?'transform:scaleX(1)':''}"><path d="M4 20 L28 20 L40 6 L47 6 L41 20 L58 20 Q64 20 64 24 Q64 28 58 28 L41 28 L47 42 L40 42 L28 28 L4 28 L0 24Z" fill="${i?'#B9DAA5':'#F2A497'}" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/></svg>
-      <div><div class="code">${f.to}</div><div class="time">${f.arr}</div><div class="ap">${f.toN}</div></div>
+      <div><div class="code">${esc(f.from)}</div><div class="time">${hm(f.dep)}</div><div class="ap">${esc(f.fromN)}</div></div>
+      <svg class="plane" viewBox="0 0 64 48" aria-hidden="true"><path d="M4 20 L28 20 L40 6 L47 6 L41 20 L58 20 Q64 20 64 24 Q64 28 58 28 L41 28 L47 42 L40 42 L28 28 L4 28 L0 24Z" fill="${i%2?'#B9DAA5':'#F2A497'}" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/></svg>
+      <div><div class="code">${esc(f.to)}</div><div class="time">${hm(f.arr)}</div><div class="ap">${esc(f.toN)}</div></div>
     </div>
-    <div class="meta"><span class="chip" style="background:var(--yellow)">${f.airline} ${f.no}</span>${f.meta.map(m=>`<span class="chip">${m}</span>`).join('')}${f.note?`<span class="chip" style="background:var(--blue)">${f.note}</span>`:''}</div>
+    <div class="meta"><span class="chip" style="background:var(--yellow)">${esc(f.airline)} ${esc(f.no)}</span>${(f.meta||[]).map(m=>`<span class="chip">${esc(m)}</span>`).join('')}${f.note?`<span class="chip" style="background:var(--blue)">${esc(f.note)}</span>`:''}</div>
   </article>`).join('');
+}
 
 /* ---------- 每日行程 ---------- */
 let cur = 0;
 function costLine(it){
   const c = [];
-  if(it.special) c.push(it.special);
+  if(it.special) c.push(esc(it.special));
   if(it.cost){
     if(it.kind==='shop') c.push(`購物預算 ${fmt(it.cost)} 韓元（≈${fmt(twd(it.cost))} 台幣，暫估）`);
     else c.push(`約 ${fmt(it.cost)} 韓元／人（≈${fmt(twd(it.cost))} 台幣）`);
@@ -504,16 +1133,16 @@ function costLine(it){
   return c.length?`<div class="cost">${c.map(x=>`<span>${x}</span>`).join('')}</div>`:'';
 }
 function renderTabs(){
-  $('#tabs').innerHTML = DAYS.map((d,i)=>`<button class="tab" role="tab" aria-selected="${i===cur}" data-i="${i}"><small>${d.label}</small><b>${d.date}</b><small>週${d.wd}</small></button>`).join('');
+  $('#tabs').innerHTML = days.map((d,i)=>`<button class="tab" role="tab" aria-selected="${i===cur}" data-i="${i}"><small>${esc(d.label)}</small><b>${md(d.date)}</b><small>週${wd(d.date)}</small></button>`).join('');
 }
 function renderDay(anim){
-  const d = DAYS[cur];
+  const d = days[cur]; if(!d){ $('#day').innerHTML=''; return; }
   const fm = d.items.filter(i=>i.kind!=='shop').reduce((a,i)=>a+(i.cost||0),0);
   const sh = d.items.filter(i=>i.kind==='shop').reduce((a,i)=>a+(i.cost||0),0);
   const pv = d.items.reduce((a,i)=>a+(i.pass||0),0);
   $('#day').innerHTML = `
-    <div class="dayhead card" style="background:${['var(--coral)','var(--yellow)','var(--blue)','var(--green)','var(--coral)'][cur]}">
-      <h3>${d.label}・${d.date}（${d.wd}）<br>${d.theme}</h3>
+    <div class="dayhead card" style="background:${DAYCOL[cur%4]}">
+      <h3>${esc(d.label)}・${md(d.date)}（${wd(d.date)}）${d.theme?'<br>'+esc(d.theme):''}</h3>
       <div class="row">
         <span class="chip">餐飲＋交通 約 ${fmt(fm)} 韓元／人（≈${fmt(twd(fm))} 台幣）</span>
         ${sh?`<span class="chip">購物 ${fmt(sh)} 韓元</span>`:''}
@@ -523,17 +1152,95 @@ function renderDay(anim){
     <ol class="tl">${d.items.map((it,i)=>`
       <li class="${it.must?'must':''}" style="--i:${anim?i:0}">
         <div class="card it">
-          <span class="tm">${it.t}</span>
-          <div class="nm"><span>${it.n}</span>${it.must?'<span class="badge-must">★ 必去</span>':''}</div>
-          ${it.tags.length?`<div class="tags">${it.tags.map(t=>`<span class="tag ${TAGCLS[t]||''}">${t}</span>`).join('')}</div>`:''}
-          ${it.note?`<p class="desc">${it.note}</p>`:''}
+          <span class="tm">${esc(it.t)}</span>
+          <div class="nm"><span>${esc(it.n)}</span>${it.must?'<span class="badge-must">★ 必去</span>':''}</div>
+          ${(it.tags||[]).length?`<div class="tags">${it.tags.map(t=>`<span class="tag ${TAGCLS[t]||''}">${esc(t)}</span>`).join('')}</div>`:''}
+          ${it.note?`<p class="desc">${esc(it.note)}</p>`:''}
           ${costLine(it)}
-          ${it.ko!==undefined && (it.ko || it.tags.length)?mapBtn(it.ko):''}
+          ${mapBtn(it.ko, it.must)}
         </div>
       </li>`).join('')}</ol>`;
   if(reduce) document.querySelectorAll('.tl li').forEach(li=>li.style.animation='none');
 }
-renderTabs(); renderDay(false);
+
+/* ---------- 備案與 Pass ---------- */
+const backups = DATA.backups||[];
+const checked = new Set();
+const usedPass = items.filter(i=>i.pass).map(i=>({n:i.n.replace(/（.*$/,''),p:i.pass}));
+function renderBackups(){
+  $('#backupList').innerHTML = backups.length ? backups.map((b,i)=>`
+  <div class="bk"><input type="checkbox" id="bk${i}" data-i="${i}" ${checked.has(i)?'checked':''} style="width:22px;height:22px;margin-top:4px;accent-color:#B9DAA5">
+  <label for="bk${i}" style="flex:1"><div style="font-size:16.5px">${esc(b.n)}</div>${b.note?`<div class="desc">${esc(b.note)}</div>`:''}<div class="cost"><span>Pass 原價 ${fmt(b.price)} 韓元</span></div></label></div>
+  <div style="margin:-2px 0 0 32px">${mapBtn(b.ko,true)}</div>`).join('') : '<p class="desc">目前沒有備案。</p>';
+}
+function renderPass(){
+  const base = usedPass.reduce((a,x)=>a+x.p,0);
+  const extra = backups.filter((b,i)=>checked.has(i)).reduce((a,b)=>a+(b.price||0),0);
+  const tot = base+extra, saved = tot-PASS;
+  $('#passTable').innerHTML = usedPass.map(x=>`<tr><td>${esc(x.n)}</td><td>${fmt(x.p)} 韓元</td></tr>`).join('')
+    + backups.map((b,i)=>checked.has(i)?`<tr><td>備案：${esc(b.n.replace(/（.*$/,''))}</td><td>${fmt(b.price)} 韓元</td></tr>`:'').join('')
+    + `<tr><td>原價合計</td><td>${fmt(tot)} 韓元（≈${fmt(twd(tot))} 台幣）</td></tr>`
+    + `<tr><td>Pass 每張</td><td>${fmt(PASS)} 韓元（≈${fmt(twd(PASS))} 台幣）</td></tr>`;
+  $('#passSum').innerHTML = saved>=0
+    ? `每人賺回 ${fmt(saved)} 韓元<br><small style="font-size:15px">≈ ${fmt(twd(saved))} 台幣，4 人共 ${fmt(saved*4)} 韓元</small>`
+    : `每人少賺 ${fmt(-saved)} 韓元，再多排幾個景點會更划算`;
+}
+
+/* ---------- 花費 ---------- */
+function renderCost(){
+  const sumK = k => items.filter(i=>i.kind===k).reduce((a,i)=>a+(i.cost||0),0);
+  const food = sumK('food'), move = sumK('move'), shop = sumK('shop');
+  const lodge = {};
+  PEOPLE.forEach(id => lodge[id] = (DATA.stays||[]).reduce((a,s)=>a+((s.share||{})[id]||0),0));
+  $('#pp').innerHTML = PEOPLE.map(id=>{const t=lodge[id]+food+move+shop+PASS;return `<div class="line"><b>${id}</b><span>${id}花費：${fmt(twd(t))} 台幣＝${fmt(t)} 韓元</span></div>`}).join('');
+  const bd = [['住宿',lodge.B,'var(--blue)'],['餐飲',food,'var(--coral)'],['交通',move,'var(--yellow)'],['購物',shop,'var(--green)'],['釜山Pass',PASS,'var(--paper)']];
+  const mx = Math.max(...bd.map(x=>x[1]),1);
+  $('#bars').innerHTML = bd.map(x=>`<div class="bar"><span>${x[0]}</span><i style="width:${Math.max(4,x[1]/mx*100)}%;background:${x[2]}"></i><span>${fmt(x[1])}</span></div>`).join('') + '<p class="hint">單位：韓元／人</p>';
+  const same = PEOPLE.every(id=>lodge[id]===lodge.B);
+  $('#lodgeHint').textContent = same ? '' : '住宿費每人不同：' + PEOPLE.map(id=>`${id} ${fmt(lodge[id])}`).join('、') + ' 韓元。';
+}
+
+/* ---------- 待辦 ---------- */
+const KEY='busan-trip-todo-v2';
+let done = safeGet(KEY) || {};
+const todos = DATA.todos||[];
+function todoProgress(){
+  const n = todos.filter(x=>done[x.t]).length;
+  $('#todoSub').textContent = `已完成 ${n} / ${todos.length}`;
+  $('#prog').style.width = (todos.length ? n/todos.length*100 : 0)+'%';
+}
+function renderTodo(){
+  $('#todoList').innerHTML = todos.map((x,i)=>`
+    <li><label><input type="checkbox" data-i="${i}" ${done[x.t]?'checked':''}><span>${esc(x.t)}<small>${esc(x.c||'')}${x.d?'・'+md(x.d)+' 前':''}${x.n?'・'+esc(x.n):''}</small></span></label></li>`).join('');
+  todoProgress();
+}
+
+/* ---------- 住宿 ---------- */
+const STAYCOL = ['var(--yellow)','var(--green)','var(--blue)','var(--coral)'];
+const stays = DATA.stays||[];
+function renderStays(){
+  $('#stayList').innerHTML = stays.map((s,i)=>{
+    const nights = Math.round((new Date(s.outD)-new Date(s.inD))/86400000);
+    const notes = String(s.note||'').split('｜').map(x=>x.trim()).filter(x=>x && !/^\d+\s*晚$/.test(x));
+    const prices = String(s.price||'').split('；').map(x=>x.trim()).filter(Boolean);
+    return `
+  <article class="card stay">
+    <span class="chip" style="background:${STAYCOL[i%4]}">${nights} 晚</span>
+    <h3 style="margin-top:8px">${esc(s.name)}</h3>
+    <div class="when"><span class="chip">入住 ${md(s.inD)}（${wd(s.inD)}）</span><span class="chip">退房 ${md(s.outD)}（${wd(s.outD)}）</span></div>
+    <p class="desc">${esc(s.addr)}</p>
+    ${prices.length?`<table style="margin-top:8px">${prices.map(r=>`<tr><td>${esc(r)}</td></tr>`).join('')}</table>`:''}
+    ${notes.map(n=>`<p class="desc">${esc(n)}</p>`).join('')}
+    <div class="btnrow">${s.ko?`<a class="btn" style="background:var(--green)" href="${navUrl(s.ko)}" target="_blank" rel="noopener">📍 Naver Map</a>`:''}<button class="btn" data-copy="${i}">複製地址</button></div>
+  </article>`}).join('');
+}
+
+function renderAll(){
+  renderHero(); renderFlights(); renderTabs(); renderDay(false);
+  renderBackups(); renderPass(); renderCost(); renderTodo(); renderStays(); tick();
+}
+
+/* ---------- 事件（只綁一次） ---------- */
 $('#tabs').addEventListener('click',e=>{
   const b = e.target.closest('.tab'); if(!b) return;
   cur = +b.dataset.i; renderTabs(); renderDay(true);
@@ -541,83 +1248,21 @@ $('#tabs').addEventListener('click',e=>{
   nb.classList.remove('bounce'); void nb.offsetWidth; nb.classList.add('bounce');
   nb.scrollIntoView({inline:'center',block:'nearest',behavior:reduce?'auto':'smooth'});
 });
-
-/* ---------- 備案與 Pass ---------- */
-const usedPass = DAYS.flatMap(d=>d.items).filter(i=>i.pass).map(i=>({n:i.n.replace(/（.*$/,''),p:i.pass}));
-const checked = new Set();
-function renderPass(){
-  const base = usedPass.reduce((a,x)=>a+x.p,0);
-  const extra = BACKUPS.filter((b,i)=>checked.has(i)).reduce((a,b)=>a+b.price,0);
-  const tot = base+extra, saved = tot-85000;
-  $('#passTable').innerHTML = usedPass.map(x=>`<tr><td>${x.n}</td><td>${fmt(x.p)} 韓元</td></tr>`).join('')
-    + BACKUPS.map((b,i)=>checked.has(i)?`<tr><td>備案：${b.n.replace(/（.*$/,'')}</td><td>${fmt(b.price)} 韓元</td></tr>`:'').join('')
-    + `<tr><td><b style="font-weight:400">原價合計</b></td><td>${fmt(tot)} 韓元（≈${fmt(twd(tot))} 台幣）</td></tr>`
-    + `<tr><td>Pass 每張</td><td>85,000 韓元（≈${fmt(twd(85000))} 台幣）</td></tr>`;
-  $('#passSum').innerHTML = saved>=0
-    ? `每人賺回 ${fmt(saved)} 韓元<br><small style="font-size:15px">≈ ${fmt(twd(saved))} 台幣，4 人共 ${fmt(saved*4)} 韓元</small>`
-    : `每人少賺 ${fmt(-saved)} 韓元，再多排幾個景點會更划算`;
-}
-$('#backupList').innerHTML = BACKUPS.map((b,i)=>`
-  <div class="bk"><input type="checkbox" id="bk${i}" data-i="${i}" style="width:22px;height:22px;margin-top:4px;accent-color:#B9DAA5">
-  <label for="bk${i}" style="flex:1"><div style="font-size:16.5px">${b.n}</div><div class="desc">${b.note}</div><div class="cost"><span>Pass 原價 ${fmt(b.price)} 韓元</span></div></label></div>
-  <div style="margin:-2px 0 0 32px">${mapBtn(b.ko)}</div>`).join('');
 $('#backupList').addEventListener('change',e=>{
-  const i = +e.target.dataset.i; e.target.checked?checked.add(i):checked.delete(i); renderPass();
+  const i = +e.target.dataset.i; if(Number.isNaN(i)) return;
+  e.target.checked?checked.add(i):checked.delete(i); renderPass();
 });
-renderPass();
-
-/* ---------- 花費 ---------- */
-const all = DAYS.flatMap(d=>d.items);
-const sumK = k => all.filter(i=>i.kind===k).reduce((a,i)=>a+(i.cost||0),0);
-const food = sumK('food'), move = sumK('move'), shop = sumK('shop'), PASS = 85000;
-const BAMBOO = 11589*RATE/4;
-const PEOPLE = [{id:'B',room:88350/2},{id:'C',room:88350/2},{id:'H',room:78000},{id:'K',room:78000}];
-const totalOf = p => BAMBOO + p.room + food + move + shop + PASS;
-$('#pp').innerHTML = PEOPLE.map(p=>{const t=totalOf(p);return `<div class="line"><b>${p.id}</b><span>${p.id}花費：${fmt(twd(t))} 台幣＝${fmt(t)} 韓元</span></div>`}).join('');
-const bd = [['住宿',BAMBOO+PEOPLE[0].room,'var(--blue)'],['餐飲',food,'var(--coral)'],['交通',move,'var(--yellow)'],['購物',shop,'var(--green)'],['釜山Pass',PASS,'var(--paper)']];
-const mx = Math.max(...bd.map(x=>x[1]));
-$('#bars').innerHTML = bd.map(x=>`<div class="bar"><span>${x[0]}</span><i style="width:${Math.max(4,x[1]/mx*100)}%;background:${x[2]}"></i><span>${fmt(x[1])}</span></div>`).join('') + '<p class="hint">單位：韓元／人</p>';
-
-/* ---------- 待辦 ---------- */
-const KEY='busan-trip-todo-v1';
-let done = safeGet(KEY) || {};
-function renderTodo(){
-  $('#todoList').innerHTML = TODOS.map((x,i)=>`
-    <li><label><input type="checkbox" data-i="${i}" ${done[i]?'checked':''}><span>${x.t}<small>${x.c}${x.d?'・'+x.d+' 前':''}${x.n?'・'+x.n:''}</small></span></label></li>`).join('');
-  const n = TODOS.filter((_,i)=>done[i]).length;
-  $('#todoSub').textContent = `已完成 ${n} / ${TODOS.length}`;
-  $('#prog').style.width = (n/TODOS.length*100)+'%';
-}
 $('#todoList').addEventListener('change',e=>{
   const i = e.target.dataset.i; if(i===undefined) return;
-  done[i] = e.target.checked; safeSet(KEY,done);
-  const n = TODOS.filter((_,k)=>done[k]).length;
-  $('#todoSub').textContent = `已完成 ${n} / ${TODOS.length}`;
-  $('#prog').style.width = (n/TODOS.length*100)+'%';
+  const t = todos[+i].t; done[t] = e.target.checked; safeSet(KEY,done); todoProgress();
 });
-renderTodo();
-
-/* ---------- 住宿 ---------- */
-$('#stayList').innerHTML = STAYS.map((s,i)=>`
-  <article class="card stay" style="border-top-width:3px">
-    <span class="chip" style="background:${s.color}">${s.nights}</span>
-    <h3 style="margin-top:8px">${s.name}</h3>
-    <div class="when"><span class="chip">入住 ${s.inD}</span><span class="chip">退房 ${s.outD}</span></div>
-    <p class="desc" style="margin-top:0">${s.who}</p>
-    <p class="desc">${s.addr}</p>
-    <table style="margin-top:8px">${s.price.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
-    <p class="desc">${s.note}</p>
-    <div class="btnrow"><a class="btn" style="background:var(--green)" href="${navUrl(s.ko)}" target="_blank" rel="noopener">📍 Naver Map</a><button class="btn" data-copy="${i}">複製地址</button></div>
-  </article>`).join('');
 $('#stayList').addEventListener('click',e=>{
   const b = e.target.closest('[data-copy]'); if(!b) return;
-  const txt = STAYS[+b.dataset.copy].addr;
+  const txt = stays[+b.dataset.copy].addr;
   const ok = ()=>toast('已複製地址');
   if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,()=>toast('無法複製，請長按地址'))}
   else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(_){toast('無法複製，請長按地址')}ta.remove()}
 });
-
-/* ---------- 選單高亮 ---------- */
 const links = [...document.querySelectorAll('#nav a')];
 const secs = links.map(a=>document.querySelector(a.getAttribute('href')));
 if('IntersectionObserver' in window){
@@ -630,6 +1275,9 @@ if('IntersectionObserver' in window){
   },{rootMargin:'-45% 0px -50% 0px'});
   secs.forEach(s=>s&&io.observe(s));
 }
+
+renderAll();
+setInterval(tick,1000);
 })();
 </script>
 </body>
