@@ -20,7 +20,7 @@ const DB = {
   todos:   process.env.DB_TODOS   || 'eb9846b9f4b648fdbf69776a616d3ae4',
 };
 const PEOPLE = ['B', 'C', 'H', 'K'];
-const TRANSIT = ['計程車', '地鐵', '公車', '機場快線', '高鐵/KTX', '包車'];
+const TRANSIT = ['計程車', '地鐵', '公車', '機場快線', '高鐵/KTX', '包車', '觀光列車'];
 
 /* ---------- Notion API ---------- */
 async function queryAll(id, sorts) {
