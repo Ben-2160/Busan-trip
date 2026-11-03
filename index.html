@@ -188,6 +188,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
   <a href="#flights">航班</a>
   <a href="#itinerary">行程</a>
   <a href="#cost">花費</a>
+  <a href="ledger.html" style="background:var(--green);border-color:var(--ink)">記帳 ↗</a>
   <a href="#todo">待辦</a>
   <a href="#stay">住宿</a>
 </nav>
@@ -303,7 +304,8 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 <!-- COST -->
 <section id="cost">
   <h2><span class="dot" style="background:var(--coral)">$</span>花費試算</h2>
-  <p class="sub">匯率 1 台幣＝40 韓元。不含機票與醫美費用；餐飲、交通、購物為暫估。</p>
+  <p class="sub">這是出發前的「預估」，匯率 1 台幣＝40 韓元，不含機票與醫美費用。</p>
+  <div class="btnrow" style="margin:-2px 0 14px"><a class="btn" href="ledger.html" style="background:var(--green)">前往記帳頁：實際花費與分帳 →</a></div>
   <div class="grid2">
     <div class="card">
       <h3 style="margin-bottom:10px">每人預估總花費</h3>
@@ -1311,7 +1313,7 @@ $('#stayList').addEventListener('click',e=>{
   if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,()=>toast('無法複製，請長按地址'))}
   else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(_){toast('無法複製，請長按地址')}ta.remove()}
 });
-const links = [...document.querySelectorAll('#nav a')];
+const links = [...document.querySelectorAll('#nav a[href^="#"]')];
 const secs = links.map(a=>document.querySelector(a.getAttribute('href')));
 if('IntersectionObserver' in window){
   const io = new IntersectionObserver(es=>{
@@ -1328,5 +1330,6 @@ renderAll();
 setInterval(tick,1000);
 })();
 </script>
+
 </body>
 </html>
