@@ -150,43 +150,6 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;background:var(--yellow);border:var(--line);border-radius:999px;padding:4px 18px;z-index:99;transition:.3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* split bill */
-.sb [hidden]{display:none !important}
-.sb .row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.sb .st{display:inline-flex;align-items:center;gap:6px;border:3px solid var(--ink);border-radius:999px;padding:0 12px;font-size:14px;background:#fff}
-.sb .st i{width:12px;height:12px;border-radius:50%;border:3px solid var(--ink);background:var(--paper);display:inline-block}
-.sb .st.live i{background:var(--green)}.sb .st.local i{background:var(--yellow)}.sb .st.wait i{background:var(--blue)}.sb .st.err i{background:var(--coral)}
-.sb .fld{display:block;font-size:14px;margin:12px 0 4px}
-.sb input[type=text],.sb input[type=number],.sb input[type=date],.sb input[type=url],.sb select{width:100%;font:inherit;font-size:16px;color:inherit;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:7px 12px;min-height:44px}
-.sb input:focus,.sb select:focus{outline:3px solid var(--blue);outline-offset:1px}
-.pick{display:flex;gap:6px;flex-wrap:wrap}
-.pick label{position:relative}
-.pick input{position:absolute;opacity:0;pointer-events:none}
-.pick span{display:inline-block;border:3px solid var(--ink);border-radius:999px;padding:3px 14px;background:#fff;cursor:pointer;min-width:46px;text-align:center;transition:transform .15s}
-.pick input:checked + span{background:var(--yellow);transform:translateY(-1px);box-shadow:0 3px 0 var(--ink)}
-.pick input:focus-visible + span{outline:3px solid var(--blue)}
-.pick.me input:checked + span{background:var(--coral)}
-.sb .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sb .cust{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
-.sb .cust label{font-size:13px}
-.sb .msg{font-size:14px;margin-top:10px;min-height:1.4em}
-.sb .msg.bad{color:#b4483a}
-.sb table.bal td{padding:7px 0;font-size:14.5px}
-.sb table.bal td:first-child{width:34px}
-.sb .pos{color:#4d7a3a}.sb .neg{color:#b4483a}
-.sb .tf{display:flex;gap:8px;align-items:center;border:3px solid var(--ink);border-radius:18px;padding:8px 12px;margin-top:8px;background:var(--paper);font-size:15px}
-.sb .tf b{font-weight:400;flex:none;width:30px;height:30px;border:3px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:14px}
-.sb .ex{border:3px solid var(--ink);border-radius:20px;padding:10px 12px;margin-top:10px;background:#fff}
-.sb .ex .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.sb .ex .d{font-size:13px;opacity:.8;margin-top:2px}
-.sb .ex .acts{display:flex;gap:6px;margin-top:8px}
-.sb .mini{font:inherit;font-size:13px;color:inherit;background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:0 12px;cursor:pointer}
-.sb .daytitle{font-size:14px;margin:14px 0 0;opacity:.85}
-.sb .btn.alt{background:var(--blue)}
-.sb .btn.warn{background:var(--coral)}
-.sb .tiny{font-size:12.5px;opacity:.8;margin-top:6px}
-.bill{font:inherit;color:inherit;cursor:pointer;background:var(--yellow);margin-left:6px}
-
 /* svg anim */
 .cloud{animation:drift 14s ease-in-out infinite alternate}
 .cloud.b{animation-duration:19s;animation-direction:alternate-reverse}
@@ -225,7 +188,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
   <a href="#flights">航班</a>
   <a href="#itinerary">行程</a>
   <a href="#cost">花費</a>
-  <a href="#split">分帳</a>
+  <a href="ledger.html" style="background:var(--green);border-color:var(--ink)">記帳 ↗</a>
   <a href="#todo">待辦</a>
   <a href="#stay">住宿</a>
 </nav>
@@ -341,7 +304,8 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 <!-- COST -->
 <section id="cost">
   <h2><span class="dot" style="background:var(--coral)">$</span>花費試算</h2>
-  <p class="sub">匯率 1 台幣＝40 韓元。不含機票與醫美費用；餐飲、交通、購物為暫估。</p>
+  <p class="sub">這是出發前的「預估」，匯率 1 台幣＝40 韓元，不含機票與醫美費用。</p>
+  <div class="btnrow" style="margin:-2px 0 14px"><a class="btn" href="ledger.html" style="background:var(--green)">前往記帳頁：實際花費與分帳 →</a></div>
   <div class="grid2">
     <div class="card">
       <h3 style="margin-bottom:10px">每人預估總花費</h3>
@@ -359,72 +323,6 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
     <table id="passTable"></table>
     <p class="big" id="passSum" style="margin-top:12px"></p>
     <p class="hint">展開上方「備案景點」並勾選，可以看加排之後的總價值。</p>
-  </div>
-</section>
-
-<!-- SPLIT -->
-<section id="split" class="sb">
-  <h2><span class="dot" style="background:var(--yellow)">¥</span>分帳</h2>
-  <p class="sub">誰先付錢就記一筆，系統自動算出最後誰要轉給誰。可以記韓元或台幣。</p>
-
-  <div class="card">
-    <div class="row2">
-      <span class="st local" id="sbState"><i></i><span id="sbStateTxt">本機模式</span></span>
-      <span style="font-size:14px">我是：</span>
-      <div class="pick me" id="sbMe"></div>
-    </div>
-    <details style="margin-top:12px" id="sbSet">
-      <summary style="font-size:15px">雲端設定（讓 4 個人共用同一本帳）</summary>
-      <label class="fld" for="sbDb">Firebase Realtime Database 網址</label>
-      <input type="url" id="sbDb" placeholder="https://xxxx-default-rtdb.firebaseio.com" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <label class="fld" for="sbTrip">帳本代碼（要夠長、別公開）</label>
-      <input type="text" id="sbTrip" placeholder="按「產生新代碼」" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <div class="btnrow">
-        <button class="btn" id="sbSave" type="button">儲存並連線</button>
-        <button class="btn alt" id="sbGen" type="button">產生新代碼</button>
-        <button class="btn" id="sbInvite" type="button" style="background:var(--green)">複製邀請連結</button>
-      </div>
-      <div class="btnrow">
-        <button class="btn" id="sbUp" type="button" hidden>把本機資料上傳雲端</button>
-        <button class="btn warn" id="sbOff" type="button">切回本機模式</button>
-      </div>
-      <p class="tiny">邀請連結已包含網址和代碼，其他人點開就會自動連線。連結不要貼到公開的地方。第一次設定步驟請看 README 的「分帳」。</p>
-    </details>
-  </div>
-
-  <div class="card" style="margin-top:16px">
-    <h3 style="margin-bottom:8px">結算</h3>
-    <div id="sbBal"></div>
-  </div>
-
-  <div class="card" style="margin-top:16px">
-    <h3 id="sbFormTitle" style="margin-bottom:2px">新增一筆支出</h3>
-    <form id="sbForm" autocomplete="off" novalidate>
-      <label class="fld" for="sbDesc">項目</label>
-      <input type="text" id="sbDesc" placeholder="例：札嘎其海鮮午餐" maxlength="60">
-      <div class="two">
-        <div><label class="fld" for="sbAmt">金額</label><input type="number" id="sbAmt" inputmode="decimal" min="0" step="any" placeholder="0"></div>
-        <div><label class="fld">幣別</label><div class="pick" id="sbCur"><label><input type="radio" name="cur" value="KRW" checked><span>韓元</span></label><label><input type="radio" name="cur" value="TWD"><span>台幣</span></label></div></div>
-      </div>
-      <label class="fld">誰先付的</label>
-      <div class="pick me" id="sbPayer"></div>
-      <label class="fld">誰要分攤</label>
-      <div class="pick" id="sbParts"></div>
-      <label class="fld">分法</label>
-      <div class="pick" id="sbMode"><label><input type="radio" name="mode" value="eq" checked><span>平分</span></label><label><input type="radio" name="mode" value="custom"><span>自訂金額</span></label></div>
-      <div class="cust" id="sbCust" hidden></div>
-      <div class="two">
-        <div><label class="fld" for="sbCat">類別</label><select id="sbCat"></select></div>
-        <div><label class="fld" for="sbDate">日期</label><input type="date" id="sbDate"></div>
-      </div>
-      <div class="msg" id="sbMsg" role="status" aria-live="polite"></div>
-      <div class="btnrow"><button class="btn" id="sbAdd" type="submit">新增支出</button><button class="btn alt" id="sbCancel" type="button" hidden>取消編輯</button></div>
-    </form>
-  </div>
-
-  <div class="card" style="margin-top:16px">
-    <div class="row2" style="justify-content:space-between"><h3>支出明細</h3><button class="mini" id="sbCopy" type="button">複製結算文字</button></div>
-    <div id="sbList"></div>
   </div>
 </section>
 
@@ -1309,7 +1207,7 @@ function renderDay(anim){
           ${(it.tags||[]).length?`<div class="tags">${it.tags.map(t=>`<span class="tag ${TAGCLS[t]||''}">${esc(t)}</span>`).join('')}</div>`:''}
           ${it.note?`<p class="desc">${esc(it.note)}</p>`:''}
           ${costLine(it)}
-          ${mapBtn(it.ko, it.must)}${(it.kind==='food'||it.kind==='move')&&it.cost?`<button class="map bill" data-bill="${i}" type="button">＋ 記一筆</button>`:''}
+          ${mapBtn(it.ko, it.must)}
         </div>
       </li>`).join('')}</ol>`;
   if(reduce) document.querySelectorAll('.tl li').forEach(li=>li.style.animation='none');
@@ -1415,7 +1313,7 @@ $('#stayList').addEventListener('click',e=>{
   if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,()=>toast('無法複製，請長按地址'))}
   else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(_){toast('無法複製，請長按地址')}ta.remove()}
 });
-const links = [...document.querySelectorAll('#nav a')];
+const links = [...document.querySelectorAll('#nav a[href^="#"]')];
 const secs = links.map(a=>document.querySelector(a.getAttribute('href')));
 if('IntersectionObserver' in window){
   const io = new IntersectionObserver(es=>{
@@ -1428,320 +1326,10 @@ if('IntersectionObserver' in window){
   secs.forEach(s=>s&&io.observe(s));
 }
 
-$('#day').addEventListener('click',e=>{
-  const b = e.target.closest('[data-bill]'); if(!b) return;
-  const it = (days[cur]||{items:[]}).items[+b.dataset.bill]; if(!it) return;
-  window.dispatchEvent(new CustomEvent('trip:bill',{detail:{desc:it.n, krw:it.cost*PEOPLE.length, cat:it.kind==='move'?'交通':'餐飲'}}));
-});
-window.TRIP = {RATE, PEOPLE};
 renderAll();
 setInterval(tick,1000);
 })();
 </script>
-<script>
-/* ========== 分帳（即時共用：Firebase Realtime Database REST + EventSource） ========== */
-(function(){
-'use strict';
-const T = window.TRIP; if(!T) return;
-const RATE = T.RATE, PEOPLE = T.PEOPLE;
-const $ = s => document.querySelector(s);
-const fmt = n => Math.round(n).toLocaleString('en-US');
-const twd = k => Math.round(k / RATE);
-const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const LS = {
-  get(k,d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
-  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-};
-const CATS = ['餐飲','交通','門票','購物','住宿','其他'];
-const K_CFG='busan-split-cfg', K_ME='busan-split-me', K_LOCAL='busan-split-local';
 
-let cfg = LS.get(K_CFG, {db:'', trip:''});
-let me = LS.get(K_ME, '');
-let store = {};          // id -> expense
-let state = 'local';     // local | wait | live | err
-let es = null, retry = null, editing = null;
-
-const cloud = () => !!(cfg.db && cfg.trip);
-const base = () => cfg.db.replace(/\/+$/,'') + '/trips/' + encodeURIComponent(cfg.trip) + '/expenses';
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-const today = () => { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
-const md = iso => iso ? iso.slice(5,7)+'/'+iso.slice(8,10) : '';
-const money = k => `${fmt(k)} 韓元（≈${fmt(twd(k))} 台幣）`;
-const toast = m => { const t = $('#toast'); if(!t) return; t.textContent = m; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(()=>t.classList.remove('show'),2200); };
-const isHttp = u => /^https?:\/\/[^\s]+$/.test(u);
-
-/* ---------- 邀請連結 ---------- */
-function importFromHash(){
-  const h = location.hash.replace(/^#/,'');
-  if(h.indexOf('trip=') < 0) return false;
-  const p = new URLSearchParams(h);
-  const db = p.get('db') || cfg.db, trip = p.get('trip');
-  if(trip && db && isHttp(db)){
-    cfg = {db: db.replace(/\/+$/,''), trip: trip}; LS.set(K_CFG, cfg);
-    try{ history.replaceState(null,'',location.pathname + location.search); }catch(e){}
-    return true;
-  }
-  return false;
-}
-const invite = () => location.origin + location.pathname + '#db=' + encodeURIComponent(cfg.db) + '&trip=' + encodeURIComponent(cfg.trip);
-
-/* ---------- 計算 ---------- */
-const krwOf = (amt, cur) => cur === 'TWD' ? Math.round(amt * RATE) : Math.round(amt);
-function equalShares(totalKrw, parts){
-  const n = parts.length, b = Math.floor(totalKrw / n); let r = totalKrw - b * n;
-  const out = {}; parts.forEach(id => { out[id] = b + (r > 0 ? 1 : 0); if(r > 0) r--; }); return out;
-}
-const expTotal = e => Object.values(e.shares||{}).reduce((a,b)=>a+(+b||0),0);
-function compute(){
-  const paid = {}, owed = {};
-  PEOPLE.forEach(id => { paid[id] = 0; owed[id] = 0; });
-  Object.values(store).forEach(e => {
-    if(!e || !e.shares) return;
-    const t = expTotal(e);
-    if(paid[e.payer] != null) paid[e.payer] += t;
-    Object.keys(e.shares).forEach(id => { if(owed[id] != null) owed[id] += +e.shares[id] || 0; });
-  });
-  const net = {}; PEOPLE.forEach(id => net[id] = paid[id] - owed[id]);
-  const cr = PEOPLE.filter(i => net[i] > 0).map(i => ({id:i, v:net[i]})).sort((a,b)=>b.v-a.v);
-  const db = PEOPLE.filter(i => net[i] < 0).map(i => ({id:i, v:-net[i]})).sort((a,b)=>b.v-a.v);
-  const tf = []; let i = 0, j = 0;
-  while(i < db.length && j < cr.length){
-    const x = Math.min(db[i].v, cr[j].v);
-    if(x >= 1) tf.push({from:db[i].id, to:cr[j].id, v:x});
-    db[i].v -= x; cr[j].v -= x;
-    if(db[i].v < 1) i++; if(cr[j].v < 1) j++;
-  }
-  return {paid, owed, net, tf};
-}
-
-/* ---------- 儲存 / 同步 ---------- */
-function persistLocal(){ if(!cloud()) LS.set(K_LOCAL, store); }
-async function remotePut(e){
-  try{
-    const r = await fetch(base() + '/' + e.id + '.json?print=silent', {method:'PUT', body: JSON.stringify(e)});
-    if(!r.ok) throw new Error(r.status);
-  }catch(err){ toast('同步失敗，請檢查網路或 Firebase 規則'); setState('err'); }
-}
-async function remoteDel(id){
-  try{
-    const r = await fetch(base() + '/' + id + '.json?print=silent', {method:'DELETE'});
-    if(!r.ok) throw new Error(r.status);
-  }catch(err){ toast('刪除失敗，請檢查網路或 Firebase 規則'); setState('err'); }
-}
-function saveExpense(e){ store[e.id] = e; persistLocal(); renderDyn(); if(cloud()) remotePut(e); }
-function deleteExpense(id){ delete store[id]; persistLocal(); renderDyn(); if(cloud()) remoteDel(id); }
-
-function applyEvent(type, payload){
-  let m; try{ m = JSON.parse(payload); }catch(e){ return; }
-  if(!m || typeof m.path !== 'string') return;
-  if(type === 'put'){
-    if(m.path === '/'){ store = (m.data && typeof m.data === 'object') ? m.data : {}; }
-    else{
-      const seg = m.path.split('/').filter(Boolean);
-      if(seg.length === 1){ if(m.data == null) delete store[seg[0]]; else store[seg[0]] = m.data; }
-    }
-  } else if(type === 'patch'){
-    if(m.path === '/' && m.data && typeof m.data === 'object'){
-      Object.keys(m.data).forEach(k => { if(m.data[k] == null) delete store[k]; else store[k] = m.data[k]; });
-    }
-  }
-  renderDyn();
-}
-function disconnect(){ if(es){ es.close(); es = null; } clearTimeout(retry); }
-function connect(){
-  disconnect();
-  if(!cloud()){
-    store = LS.get(K_LOCAL, {}) || {}; setState('local'); renderDyn(); return;
-  }
-  store = {}; setState('wait'); renderDyn();
-  try{ es = new EventSource(base() + '.json'); }catch(e){ setState('err'); return; }
-  es.addEventListener('open', () => setState('live'));
-  es.addEventListener('put', ev => { setState('live'); applyEvent('put', ev.data); });
-  es.addEventListener('patch', ev => { setState('live'); applyEvent('patch', ev.data); });
-  es.addEventListener('cancel', () => setState('err'));
-  es.addEventListener('auth_revoked', () => setState('err'));
-  es.addEventListener('error', () => {
-    setState(es && es.readyState === 2 ? 'err' : 'wait');
-    if(es && es.readyState === 2){ clearTimeout(retry); retry = setTimeout(connect, 4000); }
-  });
-}
-function setState(s){
-  state = s;
-  const el = $('#sbState'); if(!el) return;
-  el.className = 'st ' + (s === 'live' ? 'live' : s === 'wait' ? 'wait' : s === 'err' ? 'err' : 'local');
-  $('#sbStateTxt').textContent = s === 'live' ? '即時同步中' : s === 'wait' ? '連線中…' : s === 'err' ? '連線失敗，重試中' : '本機模式（只存在這支手機）';
-}
-
-/* ---------- 畫面 ---------- */
-function pickHtml(name, type, items, checked, cls){
-  return items.map(v => `<label><input type="${type}" name="${name}" value="${esc(v)}" ${checked.includes(v)?'checked':''}><span>${esc(v)}</span></label>`).join('');
-}
-function renderStatic(){
-  $('#sbMe').innerHTML = pickHtml('me','radio',PEOPLE,[me]);
-  $('#sbPayer').innerHTML = pickHtml('payer','radio',PEOPLE,[me || PEOPLE[0]]);
-  $('#sbParts').innerHTML = pickHtml('part','checkbox',PEOPLE,PEOPLE);
-  $('#sbCat').innerHTML = CATS.map(c => `<option>${c}</option>`).join('');
-  $('#sbDate').value = today();
-  $('#sbDb').value = cfg.db || ''; $('#sbTrip').value = cfg.trip || '';
-  renderCust();
-}
-const checkedVals = name => [...document.querySelectorAll(`#sbForm input[name="${name}"]:checked`)].map(x => x.value);
-const curNow = () => (document.querySelector('#sbForm input[name="cur"]:checked') || {}).value || 'KRW';
-const modeNow = () => (document.querySelector('#sbForm input[name="mode"]:checked') || {}).value || 'eq';
-function renderCust(keep){
-  const box = $('#sbCust'), parts = checkedVals('part');
-  box.hidden = modeNow() !== 'custom';
-  if(box.hidden) return;
-  const old = {}; box.querySelectorAll('input').forEach(i => old[i.dataset.id] = i.value);
-  box.innerHTML = parts.map(id => `<div><label class="fld" style="margin:0 0 3px" for="sbc${id}">${id} 分攤（${curNow()==='TWD'?'台幣':'韓元'}）</label><input type="number" id="sbc${id}" data-id="${id}" inputmode="decimal" min="0" step="any" value="${esc((keep||old)[id] ?? '')}"></div>`).join('');
-}
-function renderDyn(){
-  if(!$('#sbBal')) return;
-  const c = compute();
-  const rows = PEOPLE.map(id => {
-    const n = c.net[id];
-    return `<tr><td><b style="font-weight:400">${id}</b></td><td>已付 ${fmt(c.paid[id])}<br><small>應付 ${fmt(c.owed[id])}</small></td><td style="text-align:right" class="${n>0?'pos':n<0?'neg':''}">${n>0?'應收':n<0?'應付':'打平'} ${n===0?'':fmt(Math.abs(n))+' 韓元'}<br><small>${n===0?'':'≈'+fmt(twd(Math.abs(n)))+' 台幣'}</small></td></tr>`;
-  }).join('');
-  const total = Object.values(store).reduce((a,e)=>a+expTotal(e),0);
-  $('#sbBal').innerHTML = `<table class="bal">${rows}</table>`
-    + `<p class="tiny">全部支出 ${money(total)}，共 ${Object.keys(store).length} 筆</p>`
-    + (c.tf.length ? `<h3 style="margin-top:12px;font-size:16px">建議轉帳</h3>` + c.tf.map(t => `<div class="tf"><b>${t.from}</b>→<b>${t.to}</b><span>${fmt(t.v)} 韓元（≈${fmt(twd(t.v))} 台幣）</span></div>`).join('') : `<p class="desc" style="margin-top:8px">${Object.keys(store).length ? '目前帳都打平了。' : '還沒有任何支出。'}</p>`);
-
-  const list = Object.values(store).filter(e => e && e.shares).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.ts||0) - (a.ts||0));
-  let last = '';
-  $('#sbList').innerHTML = list.length ? list.map(e => {
-    const head = e.date !== last ? `<p class="daytitle">${md(e.date)}</p>` : ''; last = e.date;
-    const t = expTotal(e), ps = Object.keys(e.shares);
-    const orig = e.cur === 'TWD' ? `${fmt(e.amt)} 台幣` : `${fmt(e.amt)} 韓元`;
-    return head + `<div class="ex"><div class="t"><span>${esc(e.desc)} <span class="chip" style="font-size:12px;padding:0 8px">${esc(e.cat||'其他')}</span></span><span style="white-space:nowrap">${orig}</span></div>
-      <div class="d">${esc(e.payer)} 先付 ${fmt(t)} 韓元（≈${fmt(twd(t))} 台幣）・${ps.length===PEOPLE.length && Math.max(...ps.map(i=>e.shares[i]))-Math.min(...ps.map(i=>e.shares[i]))<=1 ? '4 人平分' : ps.map(i=>`${i} ${fmt(e.shares[i])}`).join('、')}${e.by?`・${esc(e.by)} 記的`:''}</div>
-      <div class="acts"><button class="mini" data-edit="${esc(e.id)}" type="button">編輯</button><button class="mini" data-del="${esc(e.id)}" type="button">刪除</button></div></div>`;
-  }).join('') : '<p class="desc" style="margin-top:10px">還沒有紀錄。到上面新增，或在行程裡按「＋ 記一筆」。</p>';
-  const up = $('#sbUp'); const loc = LS.get(K_LOCAL, {}) || {};
-  up.hidden = !(cloud() && Object.keys(loc).length);
-}
-
-/* ---------- 表單 ---------- */
-function setMsg(t, bad){ const m = $('#sbMsg'); m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); }
-function resetForm(){
-  editing = null;
-  $('#sbDesc').value = ''; $('#sbAmt').value = ''; $('#sbDate').value = today(); $('#sbCat').value = CATS[0];
-  document.querySelector('#sbForm input[name="cur"][value="KRW"]').checked = true;
-  document.querySelector('#sbForm input[name="mode"][value="eq"]').checked = true;
-  document.querySelectorAll('#sbForm input[name="part"]').forEach(x => x.checked = true);
-  const pv = me || PEOPLE[0]; const pr = document.querySelector(`#sbForm input[name="payer"][value="${pv}"]`); if(pr) pr.checked = true;
-  $('#sbFormTitle').textContent = '新增一筆支出'; $('#sbAdd').textContent = '新增支出'; $('#sbCancel').hidden = true;
-  renderCust({}); setMsg('');
-}
-function readForm(){
-  const desc = $('#sbDesc').value.trim();
-  const amt = parseFloat(String($('#sbAmt').value).replace(/,/g,''));
-  const cur = curNow(), payer = checkedVals('payer')[0], parts = checkedVals('part');
-  if(!desc) return {err:'請填項目名稱'};
-  if(!(amt > 0)) return {err:'請填大於 0 的金額'};
-  if(!payer) return {err:'請選誰先付的'};
-  if(!parts.length) return {err:'至少要有一個人分攤'};
-  let shares;
-  if(modeNow() === 'eq'){
-    shares = equalShares(krwOf(amt, cur), parts);
-  } else {
-    shares = {}; let sum = 0;
-    for(const id of parts){
-      const v = parseFloat(String(($('#sbc'+id)||{}).value || '').replace(/,/g,''));
-      if(!(v >= 0)) return {err:`請填 ${id} 的分攤金額`};
-      shares[id] = krwOf(v, cur); sum += v;
-    }
-    if(Math.abs(sum - amt) > (cur === 'TWD' ? 0.5 : 0.5)) return {err:`每人金額加總 ${fmt(sum)} 跟總額 ${fmt(amt)} 差了 ${fmt(Math.abs(sum-amt))}`};
-  }
-  return {exp:{id: editing || uid(), ts: editing && store[editing] ? store[editing].ts : Date.now(), date: $('#sbDate').value || today(), desc, cat: $('#sbCat').value, payer, cur, amt, shares, by: me || ''}};
-}
-function fillForm(e){
-  resetForm(); editing = e.id;
-  $('#sbDesc').value = e.desc; $('#sbAmt').value = e.amt; $('#sbDate').value = e.date || today(); $('#sbCat').value = e.cat || CATS[0];
-  document.querySelector(`#sbForm input[name="cur"][value="${e.cur === 'TWD' ? 'TWD' : 'KRW'}"]`).checked = true;
-  const pr = document.querySelector(`#sbForm input[name="payer"][value="${e.payer}"]`); if(pr) pr.checked = true;
-  const ps = Object.keys(e.shares);
-  document.querySelectorAll('#sbForm input[name="part"]').forEach(x => x.checked = ps.includes(x.value));
-  const t = expTotal(e), eq = equalShares(t, ps);
-  const isEq = ps.every(i => eq[i] === e.shares[i]);
-  document.querySelector(`#sbForm input[name="mode"][value="${isEq ? 'eq' : 'custom'}"]`).checked = true;
-  const keep = {}; ps.forEach(i => keep[i] = e.cur === 'TWD' ? Math.round(e.shares[i]/RATE*100)/100 : e.shares[i]);
-  renderCust(keep);
-  $('#sbFormTitle').textContent = '編輯支出'; $('#sbAdd').textContent = '儲存修改'; $('#sbCancel').hidden = false;
-  $('#sbForm').scrollIntoView({block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-}
-
-/* ---------- 事件 ---------- */
-$('#sbForm').addEventListener('change', e => {
-  if(e.target.name === 'part' || e.target.name === 'mode' || e.target.name === 'cur') renderCust();
-});
-$('#sbForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const r = readForm(); if(r.err){ setMsg(r.err, true); return; }
-  saveExpense(r.exp); const wasEdit = !!editing; resetForm(); setMsg(wasEdit ? '已更新。' : '已新增。');
-  setTimeout(() => { if($('#sbMsg').textContent.length < 6) setMsg(''); }, 2500);
-});
-$('#sbCancel').addEventListener('click', resetForm);
-$('#sbMe').addEventListener('change', e => {
-  me = e.target.value; LS.set(K_ME, me);
-  const pr = document.querySelector(`#sbForm input[name="payer"][value="${me}"]`); if(pr && !editing) pr.checked = true;
-});
-$('#sbList').addEventListener('click', e => {
-  const d = e.target.closest('[data-del]'), ed = e.target.closest('[data-edit]');
-  if(d){ const x = store[d.dataset.del]; if(x && confirm(`刪除「${x.desc}」這筆？`)) deleteExpense(d.dataset.del); }
-  if(ed && store[ed.dataset.edit]) fillForm(store[ed.dataset.edit]);
-});
-$('#sbGen').addEventListener('click', () => {
-  const a = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(a);
-  $('#sbTrip').value = 'busan-' + [...a].map(x => x.toString(36).padStart(2,'0')).join('').slice(0,18);
-});
-$('#sbSave').addEventListener('click', () => {
-  const db = $('#sbDb').value.trim().replace(/\/+$/,''), trip = $('#sbTrip').value.trim();
-  if(!isHttp(db)){ toast('Firebase 網址格式不對'); return; }
-  if(trip.length < 12){ toast('帳本代碼太短，請按「產生新代碼」'); return; }
-  cfg = {db, trip}; LS.set(K_CFG, cfg); connect(); toast('已儲存，正在連線');
-});
-$('#sbInvite').addEventListener('click', () => {
-  if(!cloud()){ toast('請先儲存雲端設定'); return; }
-  const txt = invite();
-  const ok = () => toast('已複製邀請連結，傳給其他 3 人');
-  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => prompt('請複製這個連結', txt));
-  else prompt('請複製這個連結', txt);
-});
-$('#sbOff').addEventListener('click', () => { cfg = {db:'', trip:''}; LS.set(K_CFG, cfg); $('#sbDb').value = ''; $('#sbTrip').value = ''; connect(); toast('已切回本機模式'); });
-$('#sbUp').addEventListener('click', async () => {
-  const loc = LS.get(K_LOCAL, {}) || {}; const ids = Object.keys(loc);
-  if(!ids.length || !confirm(`把本機的 ${ids.length} 筆上傳到雲端帳本？`)) return;
-  for(const id of ids){ await remotePut(loc[id]); }
-  LS.set(K_LOCAL, {}); renderDyn(); toast('已上傳');
-});
-$('#sbCopy').addEventListener('click', () => {
-  const c = compute(); const lines = ['BU想SAN班 分帳結算'];
-  PEOPLE.forEach(id => lines.push(`${id}：已付 ${fmt(c.paid[id])}、應付 ${fmt(c.owed[id])} 韓元`));
-  lines.push(c.tf.length ? '建議轉帳：' : '目前帳都打平了。');
-  c.tf.forEach(t => lines.push(`${t.from} → ${t.to}：${fmt(t.v)} 韓元（≈${fmt(twd(t.v))} 台幣）`));
-  const txt = lines.join('\n');
-  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast('已複製結算文字'), () => prompt('請複製', txt));
-  else prompt('請複製', txt);
-});
-// 行程卡片上的「＋ 記一筆」
-window.addEventListener('trip:bill', e => {
-  const d = e.detail || {}; resetForm();
-  $('#sbDesc').value = d.desc || ''; $('#sbAmt').value = d.krw || ''; if(d.cat) $('#sbCat').value = d.cat;
-  setMsg('已帶入預估金額（每人預估 × 4），請改成實際金額。');
-  const s = $('#split'); s.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-  setTimeout(() => $('#sbAmt').focus({preventScroll:true}), 400);
-});
-
-/* ---------- 啟動 ---------- */
-const imported = importFromHash();
-renderStatic(); connect();
-if(imported){
-  toast('已用邀請連結連上共用帳本');
-  if(!me) { $('#sbMe').scrollIntoView({block:'center'}); }
-  setTimeout(() => $('#split').scrollIntoView(), 300);
-}
-})();
-</script>
 </body>
 </html>
