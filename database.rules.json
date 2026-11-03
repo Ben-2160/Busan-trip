@@ -1,0 +1,17 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "trips": {
+      "$tripId": {
+        ".read": "$tripId.length >= 12",
+        ".write": "$tripId.length >= 12",
+        "expenses": {
+          "$id": {
+            ".validate": "newData.hasChildren(['desc', 'payer', 'cur', 'amt', 'shares'])"
+          }
+        }
+      }
+    }
+  }
+}
