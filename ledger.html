@@ -319,7 +319,9 @@ const LS = {
 const CATS = ['餐飲','交通','門票','購物','住宿','其他'];
 const K_CFG='busan-split-cfg', K_ME='busan-split-me', K_LOCAL='busan-split-local';
 
+const DEFAULT_DB = 'https://busan-7248c-default-rtdb.asia-southeast1.firebasedatabase.app';
 let cfg = LS.get(K_CFG, {db:'', trip:''});
+if(!cfg.db) cfg.db = DEFAULT_DB;   // 只預設資料庫網址；帳本代碼不寫進程式碼（repo 是公開的）
 let me = LS.get(K_ME, '');
 let store = {};          // id -> expense
 let state = 'local';     // local | wait | live | err
@@ -572,7 +574,7 @@ $('#sbInvite').addEventListener('click', () => {
   if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => prompt('請複製這個連結', txt));
   else prompt('請複製這個連結', txt);
 });
-$('#sbOff').addEventListener('click', () => { cfg = {db:'', trip:''}; LS.set(K_CFG, cfg); $('#sbDb').value = ''; $('#sbTrip').value = ''; connect(); toast('已切回本機模式'); });
+$('#sbOff').addEventListener('click', () => { cfg = {db: DEFAULT_DB, trip:''}; LS.set(K_CFG, cfg); $('#sbDb').value = DEFAULT_DB; $('#sbTrip').value = ''; connect(); toast('已切回本機模式'); });
 $('#sbUp').addEventListener('click', async () => {
   const loc = LS.get(K_LOCAL, {}) || {}; const ids = Object.keys(loc);
   if(!ids.length || !confirm(`把本機的 ${ids.length} 筆上傳到雲端帳本？`)) return;
