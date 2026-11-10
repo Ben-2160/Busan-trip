@@ -157,7 +157,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 .sb .st i{width:12px;height:12px;border-radius:50%;border:3px solid var(--ink);background:var(--paper);display:inline-block}
 .sb .st.live i{background:var(--green)}.sb .st.local i{background:var(--yellow)}.sb .st.wait i{background:var(--blue)}.sb .st.err i{background:var(--coral)}
 .sb .fld{display:block;font-size:14px;margin:12px 0 4px}
-.sb input[type=text],.sb input[type=number],.sb input[type=date],.sb input[type=url],.sb select{width:100%;font:inherit;font-size:16px;color:inherit;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:7px 12px;min-height:44px}
+.sb input[type=text],.sb input[type=number],.sb input[type=date],.sb input[type=time],.sb input[type=url],.sb select{width:100%;font:inherit;font-size:16px;color:inherit;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:7px 12px;min-height:44px}
 .sb input:focus,.sb select:focus{outline:3px solid var(--blue);outline-offset:1px}
 .pick{display:flex;gap:6px;flex-wrap:wrap}
 .pick label{position:relative}
@@ -283,6 +283,10 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
         <div><label class="fld" for="sbCat">類別</label><select id="sbCat"></select></div>
         <div><label class="fld" for="sbDate">日期</label><input type="date" id="sbDate"></div>
       </div>
+      <div class="two">
+        <div><label class="fld" for="sbTime">時間</label><input type="time" id="sbTime"></div>
+        <div></div>
+      </div>
       <div class="msg" id="sbMsg" role="status" aria-live="polite"></div>
       <div class="btnrow"><button class="btn" id="sbAdd" type="submit">新增支出</button><button class="btn alt" id="sbCancel" type="button" hidden>取消編輯</button></div>
     </form>
@@ -335,6 +339,7 @@ const cloud = () => !!(!cfg.off && cfg.db && cfg.trip);
 const base = () => cfg.db.replace(/\/+$/,'') + '/trips/' + encodeURIComponent(cfg.trip) + '/expenses';
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const today = () => { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const nowT = () => { const d = new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
 const md = iso => iso ? iso.slice(5,7)+'/'+iso.slice(8,10) : '';
 const money = k => `${fmt(k)} 韓元（≈${fmt(twd(k))} 台幣）`;
 const toast = m => { const t = $('#toast'); if(!t) return; t.textContent = m; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(()=>t.classList.remove('show'),2200); };
@@ -451,7 +456,7 @@ function renderStatic(){
   $('#sbPayer').innerHTML = pickHtml('payer','radio',PEOPLE,[me || PEOPLE[0]]);
   $('#sbParts').innerHTML = pickHtml('part','checkbox',PEOPLE,PEOPLE);
   $('#sbCat').innerHTML = CATS.map(c => `<option>${c}</option>`).join('');
-  $('#sbDate').value = today();
+  $('#sbDate').value = today(); $('#sbTime').value = nowT();
   $('#sbDb').value = cfg.db || ''; $('#sbTrip').value = cfg.trip || '';
   renderCust();
 }
@@ -477,14 +482,14 @@ function renderDyn(){
     + `<p class="tiny">全部支出 ${money(total)}，共 ${Object.keys(store).length} 筆</p>`
     + (c.tf.length ? `<h3 style="margin-top:12px;font-size:16px">建議轉帳</h3>` + c.tf.map(t => `<div class="tf"><b>${t.from}</b>→<b>${t.to}</b><span>${fmt(t.v)} 韓元（≈${fmt(twd(t.v))} 台幣）</span></div>`).join('') : `<p class="desc" style="margin-top:8px">${Object.keys(store).length ? '目前帳都打平了。' : '還沒有任何支出。'}</p>`);
 
-  const list = Object.values(store).filter(e => e && e.shares).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.ts||0) - (a.ts||0));
+  const list = Object.values(store).filter(e => e && e.shares).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.time||'').localeCompare(a.time||'') || (b.ts||0) - (a.ts||0));
   let last = '';
   $('#sbList').innerHTML = list.length ? list.map(e => {
     const head = e.date !== last ? `<p class="daytitle">${md(e.date)}</p>` : ''; last = e.date;
     const t = expTotal(e), ps = Object.keys(e.shares);
     const orig = e.cur === 'TWD' ? `${fmt(e.amt)} 台幣` : `${fmt(e.amt)} 韓元`;
     return head + `<div class="ex"><div class="t"><span>${esc(e.desc)} <span class="chip" style="font-size:12px;padding:0 8px">${esc(e.cat||'其他')}</span></span><span style="white-space:nowrap">${orig}</span></div>
-      <div class="d">${esc(e.payer)} 先付 ${fmt(t)} 韓元（≈${fmt(twd(t))} 台幣）・${ps.length===PEOPLE.length && Math.max(...ps.map(i=>e.shares[i]))-Math.min(...ps.map(i=>e.shares[i]))<=1 ? '4 人平分' : ps.map(i=>`${i} ${fmt(e.shares[i])}`).join('、')}${e.by?`・${esc(e.by)} 記的`:''}</div>
+      <div class="d">${esc(e.payer)} 先付 ${fmt(t)} 韓元（≈${fmt(twd(t))} 台幣）・${ps.length===PEOPLE.length && Math.max(...ps.map(i=>e.shares[i]))-Math.min(...ps.map(i=>e.shares[i]))<=1 ? '4 人平分' : ps.map(i=>`${i} ${fmt(e.shares[i])}`).join('、')}${e.time?`・${esc(e.time)}`:''}${e.by?`・${esc(e.by)} 記的`:''}</div>
       <div class="acts"><button class="mini" data-edit="${esc(e.id)}" type="button">編輯</button><button class="mini" data-del="${esc(e.id)}" type="button">刪除</button></div></div>`;
   }).join('') : '<p class="desc" style="margin-top:10px">還沒有紀錄。到上面新增，或在行程裡按「＋ 記一筆」。</p>';
   const up = $('#sbUp'); const loc = LS.get(K_LOCAL, {}) || {};
@@ -495,7 +500,7 @@ function renderDyn(){
 function setMsg(t, bad){ const m = $('#sbMsg'); m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); }
 function resetForm(){
   editing = null;
-  $('#sbDesc').value = ''; $('#sbAmt').value = ''; $('#sbDate').value = today(); $('#sbCat').value = CATS[0];
+  $('#sbDesc').value = ''; $('#sbAmt').value = ''; $('#sbDate').value = today(); $('#sbTime').value = nowT(); $('#sbCat').value = CATS[0];
   document.querySelector('#sbForm input[name="cur"][value="KRW"]').checked = true;
   document.querySelector('#sbForm input[name="mode"][value="eq"]').checked = true;
   document.querySelectorAll('#sbForm input[name="part"]').forEach(x => x.checked = true);
@@ -523,11 +528,11 @@ function readForm(){
     }
     if(Math.abs(sum - amt) > (cur === 'TWD' ? 0.5 : 0.5)) return {err:`每人金額加總 ${fmt(sum)} 跟總額 ${fmt(amt)} 差了 ${fmt(Math.abs(sum-amt))}`};
   }
-  return {exp:{id: editing || uid(), ts: editing && store[editing] ? store[editing].ts : Date.now(), date: $('#sbDate').value || today(), desc, cat: $('#sbCat').value, payer, cur, amt, shares, by: me || ''}};
+  return {exp:{id: editing || uid(), ts: editing && store[editing] ? store[editing].ts : Date.now(), date: $('#sbDate').value || today(), time: $('#sbTime').value || nowT(), desc, cat: $('#sbCat').value, payer, cur, amt, shares, by: me || ''}};
 }
 function fillForm(e){
   resetForm(); editing = e.id;
-  $('#sbDesc').value = e.desc; $('#sbAmt').value = e.amt; $('#sbDate').value = e.date || today(); $('#sbCat').value = e.cat || CATS[0];
+  $('#sbDesc').value = e.desc; $('#sbAmt').value = e.amt; $('#sbDate').value = e.date || today(); $('#sbTime').value = e.time || nowT(); $('#sbCat').value = e.cat || CATS[0];
   document.querySelector(`#sbForm input[name="cur"][value="${e.cur === 'TWD' ? 'TWD' : 'KRW'}"]`).checked = true;
   const pr = document.querySelector(`#sbForm input[name="payer"][value="${e.payer}"]`); if(pr) pr.checked = true;
   const ps = Object.keys(e.shares);
