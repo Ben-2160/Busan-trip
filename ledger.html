@@ -240,7 +240,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
       <div class="pick me" id="sbMe"></div>
     </div>
     <details style="margin-top:12px" id="sbSet">
-      <summary style="font-size:15px">雲端設定（讓 4 個人共用同一本帳）</summary>
+      <summary style="font-size:15px">進階設定（一般不用動）</summary>
       <label class="fld" for="sbDb">Firebase Realtime Database 網址</label>
       <input type="url" id="sbDb" placeholder="https://xxxx-default-rtdb.firebaseio.com" autocomplete="off" autocapitalize="off" spellcheck="false">
       <label class="fld" for="sbTrip">帳本代碼（要夠長、別公開）</label>
@@ -254,7 +254,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
         <button class="btn" id="sbUp" type="button" hidden>把本機資料上傳雲端</button>
         <button class="btn warn" id="sbOff" type="button">切回本機模式</button>
       </div>
-      <p class="tiny">邀請連結已包含網址和代碼，其他人點開就會自動連線。連結不要貼到公開的地方。第一次設定步驟請看 README 的「分帳」。</p>
+      <p class="tiny">共用帳本已經設定好，打開就會自動連線，這裡一般不用動。「切回本機模式」只會把帳記在這支手機。</p>
     </details>
   </div>
 
@@ -320,14 +320,18 @@ const CATS = ['餐飲','交通','門票','購物','住宿','其他'];
 const K_CFG='busan-split-cfg', K_ME='busan-split-me', K_LOCAL='busan-split-local';
 
 const DEFAULT_DB = 'https://busan-7248c-default-rtdb.asia-southeast1.firebasedatabase.app';
+// 共用帳本代碼直接寫在這裡：打開就連線，只要點自己的字母。
+// 注意：知道這個網站的人都能讀寫這本帳，旅行結束後請到 Firebase 把規則關掉。
+const DEFAULT_TRIP = 'busan-zvevshsxj16qwwezuakq';
 let cfg = LS.get(K_CFG, {db:'', trip:''});
-if(!cfg.db) cfg.db = DEFAULT_DB;   // 只預設資料庫網址；帳本代碼不寫進程式碼（repo 是公開的）
+if(!cfg.db) cfg.db = DEFAULT_DB;
+if(!cfg.trip) cfg.trip = DEFAULT_TRIP;
 let me = LS.get(K_ME, '');
 let store = {};          // id -> expense
 let state = 'local';     // local | wait | live | err
 let es = null, retry = null, editing = null;
 
-const cloud = () => !!(cfg.db && cfg.trip);
+const cloud = () => !!(!cfg.off && cfg.db && cfg.trip);
 const base = () => cfg.db.replace(/\/+$/,'') + '/trips/' + encodeURIComponent(cfg.trip) + '/expenses';
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const today = () => { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
@@ -574,7 +578,7 @@ $('#sbInvite').addEventListener('click', () => {
   if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => prompt('請複製這個連結', txt));
   else prompt('請複製這個連結', txt);
 });
-$('#sbOff').addEventListener('click', () => { cfg = {db: DEFAULT_DB, trip:''}; LS.set(K_CFG, cfg); $('#sbDb').value = DEFAULT_DB; $('#sbTrip').value = ''; connect(); toast('已切回本機模式'); });
+$('#sbOff').addEventListener('click', () => { cfg = {db: DEFAULT_DB, trip: DEFAULT_TRIP, off: true}; LS.set(K_CFG, cfg); $('#sbDb').value = DEFAULT_DB; $('#sbTrip').value = DEFAULT_TRIP; connect(); toast('已切回本機模式，按「儲存並連線」可連回共用帳本'); });
 $('#sbUp').addEventListener('click', async () => {
   const loc = LS.get(K_LOCAL, {}) || {}; const ids = Object.keys(loc);
   if(!ids.length || !confirm(`把本機的 ${ids.length} 筆上傳到雲端帳本？`)) return;
@@ -591,10 +595,27 @@ $('#sbCopy').addEventListener('click', () => {
   else prompt('請複製', txt);
 });
 /* ---------- 啟動 ---------- */
+// 以前用邀請連結或自己產生的代碼記過帳：把那本帳的資料搬進共用帳本，之後大家都用同一本
+async function migrateOld(){
+  const old = cfg.trip !== DEFAULT_TRIP ? cfg.trip : cfg.old;
+  if(!old || cfg.off) return;
+  const db = cfg.db;
+  cfg = {db: DEFAULT_DB, trip: DEFAULT_TRIP, old}; LS.set(K_CFG, cfg);
+  $('#sbDb').value = cfg.db; $('#sbTrip').value = cfg.trip; connect();
+  try{
+    const r = await fetch(db.replace(/\/+$/,'') + '/trips/' + encodeURIComponent(old) + '/expenses.json');
+    if(!r.ok) throw new Error(r.status);
+    const data = await r.json(); const ids = data && typeof data === 'object' ? Object.keys(data) : [];
+    for(const id of ids){ if(data[id] && data[id].shares) await fetch(base() + '/' + encodeURIComponent(id) + '.json?print=silent', {method:'PUT', body: JSON.stringify(data[id])}).then(x => { if(!x.ok) throw new Error(x.status); }); }
+    delete cfg.old; LS.set(K_CFG, cfg);
+    if(ids.length) toast(`已把舊帳本的 ${ids.length} 筆搬進共用帳本`);
+  }catch(e){ /* 下次開啟再試 */ }
+}
 const imported = importFromHash();
 renderStatic(); connect();
+migrateOld();
+if(!me) setTimeout(() => toast('先點上面的字母，選你是誰'), 600);
 if(imported){
-  toast('已用邀請連結連上共用帳本');
   if(!me) { $('#sbMe').scrollIntoView({block:'center'}); }
   setTimeout(() => $('#split').scrollIntoView(), 300);
 }
