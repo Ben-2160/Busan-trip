@@ -1163,7 +1163,7 @@ function renderFlights(){
     <div class="top"><span class="chip" style="background:${i%2?'var(--green)':'var(--coral)'}">${esc(f.dir)}</span><span>${f.dep.slice(0,4)}.${f.dep.slice(5,7)}.${f.dep.slice(8,10)}（${wd(f.dep)}）</span></div>
     <div class="route">
       <div><div class="code">${esc(f.from)}</div><div class="time">${hm(f.dep)}</div><div class="ap">${esc(f.fromN)}</div></div>
-      <svg class="plane" viewBox="0 0 64 48" aria-hidden="true"><path d="M4 20 L28 20 L40 6 L47 6 L41 20 L58 20 Q64 20 64 24 Q64 28 58 28 L41 28 L47 42 L40 42 L28 28 L4 28 L0 24Z" fill="${i%2?'#B9DAA5':'#F2A497'}" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/></svg>
+      <svg class="plane" viewBox="0 0 64 48" aria-hidden="true"><path transform="translate(64 0) scale(-1 1)" d="M4 20 L28 20 L40 6 L47 6 L41 20 L58 20 Q64 20 64 24 Q64 28 58 28 L41 28 L47 42 L40 42 L28 28 L4 28 L0 24Z" fill="${i%2?'#B9DAA5':'#F2A497'}" stroke="#3E3A39" stroke-width="3" stroke-linejoin="round"/></svg>
       <div><div class="code">${esc(f.to)}</div><div class="time">${hm(f.arr)}</div><div class="ap">${esc(f.toN)}</div></div>
     </div>
     <div class="meta"><span class="chip" style="background:var(--yellow)">${esc(f.airline)} ${esc(f.no)}</span>${(f.meta||[]).map(m=>`<span class="chip">${esc(m)}</span>`).join('')}${f.note?`<span class="chip" style="background:var(--blue)">${esc(f.note)}</span>`:''}</div>
