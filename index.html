@@ -104,7 +104,7 @@ h2 .dot{width:34px;height:34px;border:var(--line);border-radius:50%;display:inli
 .wlist li:last-child{border-bottom:0;padding-bottom:0}
 .wlist .wn{flex:1 1 42%;font-size:16px}
 .wlist .wn small{display:block;font-size:13px;opacity:.75}
-.fav[aria-pressed="true"]{background:var(--coral)}
+.fav[aria-pressed="true"],.flt[aria-pressed="true"]{background:var(--coral)}
 .badge-must{display:inline-block;background:var(--coral);border:3px solid var(--ink);border-radius:999px;padding:0 10px;font-size:13px;line-height:1.6;white-space:nowrap}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
 .tag{border:3px solid var(--ink);border-radius:999px;padding:0 10px;font-size:13px;line-height:1.55}
@@ -317,9 +317,11 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
 <section id="wish">
   <h2><span class="dot" style="background:var(--coral)">♥</span>想吃想買清單</h2>
   <p class="sub">Threads 推薦的店家。還沒排進行程，點「想去」可標記，點 Naver Map 直接開地圖。</p>
+  <div class="btnrow" id="wishFlt" role="group" aria-label="篩選類別" style="margin:0 0 12px"></div>
   <div id="wishPick"></div>
   <details class="card" id="wishGuide">
     <summary>3 大地區攻略（西面・南浦・海雲台）</summary>
+    <p class="hint"><a href="https://www.threads.com/share/Fvu8CaKeV" target="_blank" rel="noopener">Threads 原貼文</a></p>
     <div id="wishGuideList"></div>
   </details>
 </section>
@@ -1124,62 +1126,388 @@ const DATA = {
 /*WISH:START*/
 const WISH = {
  "pick": [
-  {"id":"gojip","n":"고짚 일광점（Gojip 日光店）","cat":"美食","area":"機張・日光","ko":"고짚 일광점","gm":"https://maps.app.goo.gl/W2ZMwYvCZGcnuH4J6",
-   "note":"主打韓式牛肋排（우대갈비），店員會幫忙烤，不用自己動手。五花肉也被大推，吃的時候搭醃野蒜葉（명이나물）或泡菜。",
-   "sug":"11/20 Skyline Luge 就在機張一帶，玩完可以順路吃。要排進去的話，原本的「海雲台晚餐」可以換掉。",
-   "warn":"價格與營業時間貼文沒寫，出發前到 Naver Map 確認。"},
-  {"id":"pork","n":"돼지나무 사랑걸렸네 西面本店（大蔥豬橫膈膜肉）","cat":"美食","area":"西面","ko":"돼지나무 사랑걸렸네 서면 본점","nv":"https://naver.me/xD8fjtZG","addr":"부산 부산진구 중앙대로756번길 16 1층",
-   "note":"大蔥搭油脂豐富的橫膈膜豬肉，可以配不同醬料，貼文最推明太子醬。吃完可跟店家要梅子茶解膩。",
-   "sug":"建議平日去。11/18～11/20 都是平日，11/21 是週六、而且醫美後要吃清淡。",
-   "warn":"貼文說週末不能線上預約，現場抽號碼牌等了一個多小時。地瓜冰淇淋當天賣光，不一定吃得到。"},
-  {"id":"ahee","n":"AHEE 棉被店（貼文寫 AHEE EDDING SHOP）","cat":"購物","area":"南浦洞","ko":"AHEE BEDDING 남포동",
-   "note":"11 月剛開幕的棉被店。貼文說老闆誠實、價格實在、檔期有折扣會主動告知、不強迫推銷。老闆在新東亞市場 85、87 號也有海鮮攤位，貼文說價格划算。",
-   "sug":"11/19 札嘎其市場午餐時，可以順路去新東亞市場 85、87 號吃海鮮，再逛這家店。",
-   "warn":"店名拼法待確認（貼文寫 EDDING，疑似 BEDDING）。棉被很占行李空間，回程 KE2085 的託運額度出發前先確認。"},
-  {"id":"artbox","n":"ARTBOX（文具雜貨）","cat":"購物","area":"釜山多處分店","ko":"아트박스 부산",
-   "note":"貼文說來釜山每天都會進去逛，東西可愛又便宜。",
-   "sug":"11/18 逛西面時順路去最方便。",
-   "warn":"貼文沒寫是哪一間分店，用 Naver Map 搜尋離你最近的。"}
+  {
+   "id": "gojip",
+   "n": "고짚 일광점（Gojip 日光店）",
+   "cat": "美食",
+   "area": "機張・日光",
+   "ko": "고짚 일광점",
+   "gm": "https://maps.app.goo.gl/W2ZMwYvCZGcnuH4J6",
+   "note": "主打韓式牛肋排（우대갈비），店員會幫忙烤，不用自己動手。五花肉也被大推，吃的時候搭醃野蒜葉（명이나물）或泡菜。",
+   "sug": "11/20 Skyline Luge 就在機張一帶，玩完可以順路吃。要排進去的話，原本的「海雲台晚餐」可以換掉。",
+   "warn": "價格與營業時間貼文沒寫，出發前到 Naver Map 確認。",
+   "src": "https://www.threads.com/share/FnBs3yfqm"
+  },
+  {
+   "id": "pork",
+   "n": "돼지나무 사랑걸렸네 西面本店（大蔥豬橫膈膜肉）",
+   "cat": "美食",
+   "area": "西面",
+   "ko": "돼지나무 사랑걸렸네 서면 본점",
+   "nv": "https://naver.me/xD8fjtZG",
+   "addr": "부산 부산진구 중앙대로756번길 16 1층",
+   "note": "大蔥搭油脂豐富的橫膈膜豬肉，可以配不同醬料，貼文最推明太子醬。吃完可跟店家要梅子茶解膩。",
+   "sug": "建議平日去。11/18～11/20 都是平日，11/21 是週六、而且醫美後要吃清淡。",
+   "warn": "貼文說週末不能線上預約，現場抽號碼牌等了一個多小時。地瓜冰淇淋當天賣光，不一定吃得到。",
+   "src": "https://www.threads.com/share/JFZ-DjAfl"
+  },
+  {
+   "id": "ahee",
+   "n": "AHEE 棉被店（貼文寫 AHEE EDDING SHOP）",
+   "cat": "購物",
+   "area": "南浦洞",
+   "ko": "AHEE BEDDING 남포동",
+   "note": "11 月剛開幕的棉被店。貼文說老闆誠實、價格實在、檔期有折扣會主動告知、不強迫推銷。老闆在新東亞市場 85、87 號也有海鮮攤位，貼文說價格划算。",
+   "sug": "11/19 札嘎其市場午餐時，可以順路去新東亞市場 85、87 號吃海鮮，再逛這家店。",
+   "warn": "店名拼法待確認（貼文寫 EDDING，疑似 BEDDING）。棉被很占行李空間，回程 KE2085 的託運額度出發前先確認。",
+   "src": "https://www.threads.com/share/ISD37Kfm5"
+  },
+  {
+   "id": "artbox",
+   "n": "ARTBOX（文具雜貨）",
+   "cat": "購物",
+   "area": "釜山多處分店",
+   "ko": "아트박스 부산",
+   "note": "貼文說來釜山每天都會進去逛，東西可愛又便宜。",
+   "sug": "11/18 逛西面時順路去最方便。",
+   "warn": "貼文沒寫是哪一間分店，用 Naver Map 搜尋離你最近的。",
+   "src": "https://www.threads.com/share/DgomCbvsn"
+  },
+  {
+   "id": "matgo",
+   "n": "맛고 蓮山市廳本店（伊比利豬）",
+   "cat": "美食",
+   "area": "蓮山（西面搭地鐵）",
+   "ko": "맛고 연산시청본점",
+   "addr": "603-23 Yeonsan-dong, Yeonje-gu, Busan（蓮山站 10 號出口步行 3 分鐘）",
+   "note": "貼文稱 Naver 上約 1.1 萬則評論、4.91 分的伊比利豬名店。伊比利豬肋條醃肉配白飯很推，蒸蛋也要點，店家用熟成 3 天的伊比利豬。",
+   "sug": "離西面不遠，搭地鐵過去，11/18～11/20 晚上都排得進去。",
+   "warn": "營業時間與是否要訂位貼文沒寫，出發前到 Naver Map 確認。",
+   "src": "https://www.threads.com/share/EI2VRr9sQ"
+  },
+  {
+   "id": "bbq3",
+   "n": "烤肉三選一：廣安木／烤肉的男子／Gowon",
+   "cat": "美食",
+   "area": "廣安里・南浦",
+   "note": "廣安木（廣安里）：熟成黑豬肉香濃，店員代烤，吃完可逛廣安里海邊，離西面、南浦較遠要搭車。烤肉的男子（南浦）：交通方便、小菜豐富、份量大 CP 值高、走年輕路線。Gowon：在地人的小店、環境舒服、評論較少。另有留言推薦「老宅邸」，可用 Catch Table 訂位。",
+   "sug": "11/19 在南浦可以選烤肉的男子；11/21 去廣安里可以選廣安木。",
+   "warn": "留言說三間都建議先訂位，週末晚上很滿（11/21 是週六）。醫美前後的飲食限制，先問診所。這幾間我沒查到韓文店名，Naver 請用留言裡的名字搜尋。"
+  },
+  {
+   "id": "angelinus",
+   "n": "Angelinus 金海機場店（伯爵奶茶）",
+   "cat": "咖啡甜點",
+   "area": "金海機場",
+   "ko": "엔제리너스 김해공항",
+   "note": "貼文說金海機場這間的伯爵奶茶超級好喝，抹茶拿鐵也很讚。",
+   "sug": "11/22 辦完登機後、或 11/18 落地時買。",
+   "warn": "貼文沒寫是出境還是入境側，營業時間也待確認。"
+  },
+  {
+   "id": "busandang",
+   "n": "부산당 海雲台總店（1983 黃金紅豆麵包）",
+   "cat": "咖啡甜點",
+   "area": "海雲台",
+   "nv": "https://naver.me/5bCS4Npk",
+   "addr": "부산 해운대구 우동 634-3（總店）。貼文拍到的店面在總店對面。",
+   "note": "紅豆麵包，貼文說最後一天買了想帶回台灣。",
+   "sug": "11/20 在海雲台時順路買。",
+   "warn": "貼文作者買了卻忘記帶下飛機，記得隨身帶好。"
+  },
+  {
+   "id": "toast",
+   "n": "釜田市場入口的街頭早餐吐司",
+   "cat": "美食",
+   "area": "西面",
+   "ko": "부전시장",
+   "note": "貼文說釜田市場入口處有道地早餐，作者跟媽媽連續去了兩天，說不用特地去新昌烤麵包（西面站 15 號出口）。",
+   "sug": "住 bamboo:on 時，11/19 或 11/20 早餐可以去。",
+   "warn": "攤位名稱貼文沒寫，營業時間待確認。",
+   "src": "https://www.threads.com/share/D055U2q3V"
+  },
+  {
+   "id": "jaemo",
+   "n": "李在模披薩（이재모피자）",
+   "cat": "美食",
+   "area": "南浦洞",
+   "ko": "이재모피자",
+   "note": "你指定要加入的店，貼文沒有提供內容。",
+   "sug": "11/19 在南浦時順路最方便。",
+   "warn": "地址、營業時間與是否要候位待確認。"
+  },
+  {
+   "id": "baro",
+   "n": "牛肉湯飯店（帳號 barohaejang.tw）",
+   "cat": "美食",
+   "area": "待確認（看 Google Maps）",
+   "gm": "https://maps.app.goo.gl/yW7zCGHf7REwoEBa7",
+   "note": "牛肉湯飯，也有麵的吃法。店家說有不清楚的地方可以直接問，也可以拿菜單照片請店員介紹，加小菜、把湯再加熱都可以用手機翻譯溝通。",
+   "warn": "店名是我依帳號名稱判斷（바로해장），不一定準確，請以 Google Maps 為準。",
+   "src": "https://www.threads.com/share/HxxJY5T18"
+  },
+  {
+   "id": "yegam",
+   "n": "예감 烤洋蔥口味餅乾（樂天買）",
+   "cat": "購物",
+   "area": "樂天超市",
+   "note": "一盒 12 小包，貼文說烤過的洋蔥口味很脆，兩天就吃光。",
+   "warn": "貼文沒寫價格。",
+   "src": "https://www.threads.com/share/IqPTrGMo2"
+  },
+  {
+   "id": "gam",
+   "n": "감말랭이（柿乾）（樂天超市）",
+   "cat": "購物",
+   "area": "樂天超市",
+   "note": "貼文說樂天超市這款柿乾能帶多少買多少，並說確定可以帶回台灣。照片中的價籤約 14,900 韓元。",
+   "warn": "能不能帶回台灣，入境前以台灣防檢署規定為準，我沒有查證。價格以現場為準。",
+   "src": "https://www.threads.com/share/DPdGkkJSL"
+  },
+  {
+   "id": "newmix",
+   "n": "Newmix（粉末沖泡飲）",
+   "cat": "購物",
+   "area": "店面位置貼文沒寫",
+   "note": "貼文說只有韓國買得到，有抹茶拿鐵等各種特別口味，店面可以試喝。",
+   "warn": "賣場位置待確認。",
+   "src": "https://www.threads.com/share/JCWJlyEYv"
+  },
+  {
+   "id": "mixxo",
+   "n": "MIXXO 鋪毛棉褲（Curved Pants）",
+   "cat": "購物",
+   "area": "服飾",
+   "ko": "미쏘 서면",
+   "note": "貼文說版型垂墜感好、很軟，作者 158 公分穿 M。",
+   "warn": "分店用 Naver Map 搜尋，我沒確認西面有沒有賣。",
+   "src": "https://www.threads.com/share/ECXqdDCBj"
+  },
+  {
+   "id": "wannabe",
+   "n": "WANNABE（田浦服飾店）",
+   "cat": "購物",
+   "area": "田浦（西面一帶）",
+   "ko": "워너비 전포",
+   "note": "貼文說款式超多，作者挖到的風衣外套超好看。",
+   "sug": "11/21 在西面採購時順路。",
+   "warn": "韓文店名是我推測，請以地圖為準。",
+   "src": "https://www.threads.com/share/DTZ_603ZE"
+  },
+  {
+   "id": "bus",
+   "n": "金海機場巴士（到西面或海雲台）",
+   "cat": "交通",
+   "area": "金海機場",
+   "note": "貼文說出境後走到 Gate 5 售票，上車在 Gate 3 前的公車站牌。有兩條路線：經西面樂天百貨前、前往海雲台。車資 6,000 韓元起，有固定發車時間，手提登機箱可帶上車，大行李司機會放在車下置物空間。",
+   "sug": "11/18 落地後不趕時間的話，可以代替輕軌加地鐵。",
+   "warn": "班次與首班車時間貼文沒寫，11/18 早上 06:10 落地，出發前先確認。",
+   "src": "https://www.threads.com/share/PorSFBOHi"
+  },
+  {
+   "id": "warn",
+   "n": "踩雷提醒（單一貼文與留言）",
+   "cat": "提醒",
+   "area": "廣安里・海雲台",
+   "note": "一位作者說廣安里的「83」開頭那間烤肉普通、有豬肉臭味，海雲台 60 炸雞還可以，海雲台市場阿婆海鮮煎餅不好吃。留言說海雲台炸雞只推地鐵站旁的「普拉達」。",
+   "warn": "這些是個人口味評價，只當參考。"
+  },
+  {
+   "id": "refs",
+   "n": "還沒收進內容的購物貼文",
+   "cat": "購物",
+   "area": "大創／藥局",
+   "note": "大創必買與藥局必買的貼文連結，我打不開，內容還沒放進來。",
+   "sug": "把貼文截圖給我，我再整理成清單。",
+   "links": [
+    [
+     "大創必買",
+     "https://www.threads.com/share/HfrVfeok5"
+    ],
+    [
+     "藥局必買",
+     "https://www.threads.com/share/EJLzsbrde"
+    ]
+   ]
+  }
  ],
  "guide": [
-  {"area":"西面","tip":"換錢：老奶奶／WowPas","items":[
-   {"n":"西面地下街","t":"景點","ko":"서면지하상가"},
-   {"n":"田浦咖啡街","t":"景點","ko":"전포카페거리"},
-   {"n":"青春街","t":"景點"},
-   {"n":"味贊王鹽烤肉","t":"美食","ko":"맛찬들왕소금구이 서면"},
-   {"n":"松亭 3 代豬肉湯飯","t":"美食","ko":"송정3대국밥 서면"},
-   {"n":"螞蟻家辣炒章魚","t":"美食","ko":"개미집 서면"},
-   {"n":"釜田市場豬肉湯飯一條街","t":"美食","ko":"서면 돼지국밥 골목"},
-   {"n":"小熊奶油蛋糕","t":"甜點"},
-   {"n":"番茄羅勒冰淇淋","t":"甜點"},
-   {"n":"Diart 手沖","t":"甜點"}]},
-  {"area":"南浦","items":[
-   {"n":"甘川洞","t":"景點","plan":"11/19"},
-   {"n":"松島纜車","t":"景點","plan":"11/19"},
-   {"n":"天空步道","t":"景點"},
-   {"n":"白淺灘村","t":"景點","ko":"흰여울문화마을"},
-   {"n":"札嘎其市場","t":"景點","plan":"11/19"},
-   {"n":"國際市場","t":"景點","ko":"국제시장"},
-   {"n":"龍頭山釜山塔","t":"景點","plan":"11/19"},
-   {"n":"札嘎其現撈海鮮","t":"美食","plan":"11/19"},
-   {"n":"南浦雪濃湯","t":"美食"},
-   {"n":"南浦豬腳街","t":"美食","ko":"부평족발골목"},
-   {"n":"富平罐頭市場韭菜煎餅","t":"美食","ko":"부평깡통시장"},
-   {"n":"昇基堅果黑糖餅","t":"甜點","ko":"승기호떡"}]},
-  {"area":"海雲台","items":[
-   {"n":"Busan X the SKY","t":"景點","plan":"11/20"},
-   {"n":"天空膠囊列車","t":"景點","plan":"11/20"},
-   {"n":"海岸列車","t":"景點","plan":"11/20"},
-   {"n":"青沙浦踏石展望台","t":"景點","plan":"11/20"},
-   {"n":"The Bay 101","t":"景點","ko":"더베이101"},
-   {"n":"密陽血腸豬肉湯飯","t":"美食"},
-   {"n":"伍班長起司烤肉","t":"美食"},
-   {"n":"大海鮑魚粥","t":"美食"},
-   {"n":"1 號貝殼店烤扇貝鍋","t":"美食"},
-   {"n":"Waveon Coffee","t":"甜點","ko":"웨이브온 청사포"},
-   {"n":"膠囊列車咖啡","t":"甜點"},
-   {"n":"奶油餅乾","t":"甜點"}]}
- ]
+  {
+   "area": "西面",
+   "tip": "換錢：老奶奶／WowPas",
+   "items": [
+    {
+     "n": "西面地下街",
+     "t": "景點",
+     "ko": "서면지하상가"
+    },
+    {
+     "n": "田浦咖啡街",
+     "t": "景點",
+     "ko": "전포카페거리"
+    },
+    {
+     "n": "青春街",
+     "t": "景點"
+    },
+    {
+     "n": "味贊王鹽烤肉",
+     "t": "美食",
+     "ko": "맛찬들왕소금구이 서면"
+    },
+    {
+     "n": "松亭 3 代豬肉湯飯",
+     "t": "美食",
+     "ko": "송정3대국밥 서면"
+    },
+    {
+     "n": "螞蟻家辣炒章魚",
+     "t": "美食",
+     "ko": "개미집 서면"
+    },
+    {
+     "n": "釜田市場豬肉湯飯一條街",
+     "t": "美食",
+     "ko": "서면 돼지국밥 골목"
+    },
+    {
+     "n": "小熊奶油蛋糕",
+     "t": "甜點"
+    },
+    {
+     "n": "番茄羅勒冰淇淋",
+     "t": "甜點"
+    },
+    {
+     "n": "Diart 手沖",
+     "t": "甜點"
+    }
+   ]
+  },
+  {
+   "area": "南浦",
+   "items": [
+    {
+     "n": "甘川洞",
+     "t": "景點",
+     "plan": "11/19"
+    },
+    {
+     "n": "松島纜車",
+     "t": "景點",
+     "plan": "11/19"
+    },
+    {
+     "n": "天空步道",
+     "t": "景點"
+    },
+    {
+     "n": "白淺灘村",
+     "t": "景點",
+     "ko": "흰여울문화마을"
+    },
+    {
+     "n": "札嘎其市場",
+     "t": "景點",
+     "plan": "11/19"
+    },
+    {
+     "n": "國際市場",
+     "t": "景點",
+     "ko": "국제시장"
+    },
+    {
+     "n": "龍頭山釜山塔",
+     "t": "景點",
+     "plan": "11/19"
+    },
+    {
+     "n": "札嘎其現撈海鮮",
+     "t": "美食",
+     "plan": "11/19"
+    },
+    {
+     "n": "南浦雪濃湯",
+     "t": "美食"
+    },
+    {
+     "n": "南浦豬腳街",
+     "t": "美食",
+     "ko": "부평족발골목"
+    },
+    {
+     "n": "富平罐頭市場韭菜煎餅",
+     "t": "美食",
+     "ko": "부평깡통시장"
+    },
+    {
+     "n": "昇基堅果黑糖餅",
+     "t": "甜點",
+     "ko": "승기호떡"
+    }
+   ]
+  },
+  {
+   "area": "海雲台",
+   "items": [
+    {
+     "n": "Busan X the SKY",
+     "t": "景點",
+     "plan": "11/20"
+    },
+    {
+     "n": "天空膠囊列車",
+     "t": "景點",
+     "plan": "11/20"
+    },
+    {
+     "n": "海岸列車",
+     "t": "景點",
+     "plan": "11/20"
+    },
+    {
+     "n": "青沙浦踏石展望台",
+     "t": "景點",
+     "plan": "11/20"
+    },
+    {
+     "n": "The Bay 101",
+     "t": "景點",
+     "ko": "더베이101"
+    },
+    {
+     "n": "密陽血腸豬肉湯飯",
+     "t": "美食"
+    },
+    {
+     "n": "伍班長起司烤肉",
+     "t": "美食"
+    },
+    {
+     "n": "大海鮑魚粥",
+     "t": "美食"
+    },
+    {
+     "n": "1 號貝殼店烤扇貝鍋",
+     "t": "美食"
+    },
+    {
+     "n": "Waveon Coffee",
+     "t": "甜點",
+     "ko": "웨이브온 청사포"
+    },
+    {
+     "n": "膠囊列車咖啡",
+     "t": "甜點"
+    },
+    {
+     "n": "奶油餅乾",
+     "t": "甜點"
+    }
+   ]
+  }
+ ],
+ "guideSrc": "https://www.threads.com/share/Fvu8CaKeV"
 };
 /*WISH:END*/
 
@@ -1374,9 +1702,12 @@ const K_WISH = 'busan-trip-wish-v1';
 let favs = new Set(safeGet(K_WISH)||[]);
 function saveFavs(){ safeSet(K_WISH, [...favs]); }
 function favBtn(id){ const on = favs.has(id); return `<button class="btn fav" type="button" data-fav="${esc(id)}" aria-pressed="${on}">${on?'★ 想去':'☆ 想去'}</button>`; }
+let wishCat = '全部';
 function renderWish(){
-  $('#wishPick').innerHTML = WISH.pick.map(w=>{
-    const href = w.nv || navUrl(w.ko);
+  const cats = ['全部', ...new Set(WISH.pick.map(w=>w.cat))];
+  $('#wishFlt').innerHTML = cats.map(c=>`<button class="btn flt" type="button" data-flt="${esc(c)}" aria-pressed="${c===wishCat}">${esc(c)}</button>`).join('');
+  $('#wishPick').innerHTML = WISH.pick.filter(w=>wishCat==='全部'||w.cat===wishCat).map(w=>{
+    const href = w.nv || (w.ko ? navUrl(w.ko) : '');
     return `<article class="card wish">
       <div class="area"><span class="chip">${esc(w.cat)}</span> <span class="chip">${esc(w.area)}</span></div>
       <h3>${esc(w.n)}</h3>
@@ -1384,7 +1715,7 @@ function renderWish(){
       ${w.addr?`<p class="hint">${esc(w.addr)}</p>`:''}
       ${w.sug?`<div class="sug">💡 ${esc(w.sug)}</div>`:''}
       ${w.warn?`<p class="warn">⚠ ${esc(w.warn)}</p>`:''}
-      <div class="btnrow"><a class="btn" style="background:var(--green)" href="${esc(href)}" target="_blank" rel="noopener">📍 Naver Map</a>${w.gm?`<a class="btn" style="background:var(--blue)" href="${esc(w.gm)}" target="_blank" rel="noopener">Google Maps</a>`:''}${favBtn(w.id)}</div>
+      <div class="btnrow">${href?`<a class="btn" style="background:var(--green)" href="${esc(href)}" target="_blank" rel="noopener">📍 Naver Map</a>`:''}${(w.links||[]).map(l=>`<a class="btn" style="background:var(--yellow)" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}${w.src?`<a class="btn" href="${esc(w.src)}" target="_blank" rel="noopener">Threads 貼文</a>`:''}${w.gm?`<a class="btn" style="background:var(--blue)" href="${esc(w.gm)}" target="_blank" rel="noopener">Google Maps</a>`:''}${(w.cat==='提醒'||w.id==='refs')?'':favBtn(w.id)}</div>
     </article>`;}).join('');
   $('#wishGuideList').innerHTML = WISH.guide.map((g,gi)=>`
     <h3 style="margin:14px 0 0;font-size:17px">${esc(g.area)}</h3>
@@ -1402,6 +1733,8 @@ function renderAll(){
 
 /* ---------- 事件（只綁一次） ---------- */
 document.addEventListener('click',e=>{
+  const f = e.target.closest('[data-flt]');
+  if(f){ wishCat = f.dataset.flt; renderWish(); return; }
   const b = e.target.closest('[data-fav]'); if(!b) return;
   const id = b.dataset.fav; favs.has(id) ? favs.delete(id) : favs.add(id); saveFavs();
   b.setAttribute('aria-pressed', favs.has(id)); b.textContent = favs.has(id) ? '★ 想去' : '☆ 想去';
