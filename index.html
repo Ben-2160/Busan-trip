@@ -430,71 +430,73 @@ const DATA = {
     },
     {
      "t": "07:30",
-     "n": "輕軌＋地鐵到西面",
+     "n": "輕軌＋地鐵到 Centum City 站",
      "tags": [
       "地鐵"
      ],
      "must": false,
-     "ko": "서면역",
-     "note": "金海機場輕軌轉地鐵 2 號線到西面。行李多或太累可改搭大型計程車，4 人分攤。",
+     "ko": "센텀시티역",
+     "note": "金海機場輕軌轉地鐵 2 號線到 Centum City 站（約 1 小時）。行李多或太累可改搭大型計程車，4 人分攤。",
      "cost": 2000,
      "kind": "move"
     },
     {
      "t": "08:30",
-     "n": "豬肉湯飯早餐",
-     "tags": [
-      "步行"
-     ],
-     "must": true,
-     "ko": "서면 돼지국밥골목",
-     "note": "下飛機的第一餐。西面有一整條豬肉湯飯街，進店前先看營業時間。",
-     "cost": 11000,
-     "kind": "food"
-    },
-    {
-     "t": "10:30",
-     "n": "寄放行李（bamboo:on）",
+     "n": "Centum City 附近早餐",
      "tags": [
       "步行"
      ],
      "must": false,
-     "ko": "부산진구 동성로61번길 32",
-     "note": "房東通知：最早 10:30 才能寄放行李，16:00 入住。計程車請給司機看：서전로68번길 39 2층（전포동 220-1）（不是房源地址，是最快抵達的地址）。"
-    },
-    {
-     "t": "11:00",
-     "n": "逛西面＋Olive Young 初探",
-     "tags": [
-      "步行"
-     ],
-     "must": true,
-     "ko": "서면 올리브영",
-     "note": "先逛地下街，看 Olive Young 有哪些想買，正式採購排在 11/21 醫美之後。",
-     "cost": 30000,
-     "kind": "shop"
-    },
-    {
-     "t": "12:30",
-     "n": "西面小吃午餐",
-     "tags": [
-      "步行"
-     ],
-     "must": false,
-     "ko": "서면 먹자골목",
-     "note": "早餐吃得多，午餐吃小吃就好。",
+     "ko": "센텀시티 아침식사",
+     "note": "先吃點東西再泡湯。豬肉湯飯改到午餐或之後（想吃清單有幾間）。",
      "cost": 8000,
      "kind": "food"
     },
     {
-     "t": "16:00",
-     "n": "回飯店入住、補眠",
+     "t": "09:00",
+     "n": "Spa Land 汗蒸幕（Centum City）",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "센텀 스파랜드",
+     "note": "營業時間各來源寫法不同（09:00 或 08:00 開門），出發前看官網確認。固定 4 小時入場票，超時加價；大面積紋身不能入場。行李能否寄放現場未確認，入場時問櫃台。",
+     "cost": 26000,
+     "kind": "play"
+    },
+    {
+     "t": "13:00",
+     "n": "Centum City／海雲台午餐",
      "tags": [
       "步行"
      ],
      "must": false,
+     "ko": "센텀시티 맛집",
+     "note": "泡完湯想吃熱的，可以挑想吃清單裡的豬肉湯飯。",
+     "cost": 12000,
+     "kind": "food"
+    },
+    {
+     "t": "14:30",
+     "n": "地鐵回西面",
+     "tags": [
+      "地鐵"
+     ],
+     "must": false,
+     "ko": "서면역",
+     "note": "2 號線 Centum City 站到西面約 20 分鐘。",
+     "cost": 1500,
+     "kind": "move"
+    },
+    {
+     "t": "15:30",
+     "n": "回飯店（bamboo:on）入住、補眠",
+     "tags": [
+      "計程車"
+     ],
+     "must": false,
      "ko": "부산진구 동성로61번길 32",
-     "note": "16:00 後入住（房東通知），先睡一下，晚餐才有體力。"
+     "note": "房東通知 16:00 後入住（10:30 起可寄放行李）。計程車請給司機看：서전로68번길 39 2층（전포동 220-1）（不是房源地址，是最快抵達的地址）。先睡一下，晚餐才有體力。"
     },
     {
      "t": "18:00",
@@ -507,6 +509,18 @@ const DATA = {
      "note": "店家待選：挑 Naver Map 評分 4.0 以上並先訂位。預估每人約 6 萬韓元。",
      "cost": 60000,
      "kind": "food"
+    },
+    {
+     "t": "19:30",
+     "n": "逛西面＋Olive Young 初探",
+     "tags": [
+      "步行"
+     ],
+     "must": true,
+     "ko": "서면 올리브영",
+     "note": "晚餐後逛地下街，看 Olive Young 有哪些想買，正式採購排在 11/21 醫美之後。",
+     "cost": 30000,
+     "kind": "shop"
     }
    ]
   },
@@ -1878,11 +1892,11 @@ function renderPass(){
 /* ---------- 花費 ---------- */
 function renderCost(){
   const sumK = k => items.filter(i=>i.kind===k).reduce((a,i)=>a+(i.cost||0),0);
-  const food = sumK('food'), move = sumK('move'), shop = sumK('shop');
+  const food = sumK('food'), move = sumK('move'), shop = sumK('shop'), play = sumK('play');
   const lodge = {};
   PEOPLE.forEach(id => lodge[id] = (DATA.stays||[]).reduce((a,s)=>a+((s.share||{})[id]||0),0));
-  $('#pp').innerHTML = PEOPLE.map(id=>{const t=lodge[id]+food+move+shop+PASS;return `<div class="line"><b>${id}</b><span>${id}花費：${fmt(twd(t))} 台幣＝${fmt(t)} 韓元</span></div>`}).join('');
-  const bd = [['住宿',lodge.B,'var(--blue)'],['餐飲',food,'var(--coral)'],['交通',move,'var(--yellow)'],['購物',shop,'var(--green)'],['釜山Pass',PASS,'var(--paper)']];
+  $('#pp').innerHTML = PEOPLE.map(id=>{const t=lodge[id]+food+move+shop+play+PASS;return `<div class="line"><b>${id}</b><span>${id}花費：${fmt(twd(t))} 台幣＝${fmt(t)} 韓元</span></div>`}).join('');
+  const bd = [['住宿',lodge.B,'var(--blue)'],['餐飲',food,'var(--coral)'],['交通',move,'var(--yellow)'],['購物',shop,'var(--green)'],['活動',play,'var(--pink,var(--paper))'],['釜山Pass',PASS,'var(--paper)']];
   const mx = Math.max(...bd.map(x=>x[1]),1);
   $('#bars').innerHTML = bd.map(x=>`<div class="bar"><span>${x[0]}</span><i style="width:${Math.max(4,x[1]/mx*100)}%;background:${x[2]}"></i><span>${fmt(x[1])}</span></div>`).join('') + '<p class="hint">單位：韓元／人</p>';
   const same = PEOPLE.every(id=>lodge[id]===lodge.B);
