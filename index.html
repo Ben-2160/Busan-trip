@@ -94,6 +94,17 @@ h2 .dot{width:34px;height:34px;border:var(--line);border-radius:50%;display:inli
 .tl .it{padding:12px 14px}
 .tl .tm{font-size:14px;display:inline-block;background:var(--blue);border:3px solid var(--ink);border-radius:999px;padding:0 10px;margin-bottom:4px}
 .tl .nm{font-size:18px;line-height:1.4;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.wish{margin-bottom:14px}
+.wish .area{display:inline-block;margin:0 0 6px;font-size:13px}
+.wish h3{font-size:18px;line-height:1.4;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wish .sug{margin-top:8px;border:3px dashed var(--ink);border-radius:14px;padding:6px 12px;background:var(--paper);font-size:14px}
+.wish .warn{opacity:.8;font-size:13px;margin-top:6px}
+.wlist{list-style:none;display:grid;gap:8px;margin-top:10px}
+.wlist li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:2px dotted rgba(62,58,57,.35);padding-bottom:8px}
+.wlist li:last-child{border-bottom:0;padding-bottom:0}
+.wlist .wn{flex:1 1 42%;font-size:16px}
+.wlist .wn small{display:block;font-size:13px;opacity:.75}
+.fav[aria-pressed="true"]{background:var(--coral)}
 .badge-must{display:inline-block;background:var(--coral);border:3px solid var(--ink);border-radius:999px;padding:0 10px;font-size:13px;line-height:1.6;white-space:nowrap}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
 .tag{border:3px solid var(--ink);border-radius:999px;padding:0 10px;font-size:13px;line-height:1.55}
@@ -187,6 +198,7 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
   <a href="#home" class="on">首頁</a>
   <a href="#flights">航班</a>
   <a href="#itinerary">行程</a>
+  <a href="#wish">想吃</a>
   <a href="#cost">花費</a>
   <a href="ledger.html" style="background:var(--green);border-color:var(--ink)">記帳 ↗</a>
   <a href="#todo">待辦</a>
@@ -298,6 +310,17 @@ footer{max-width:760px;margin:30px auto 0;padding:0 16px 40px;text-align:center;
   <details class="card" id="backup">
     <summary>備案景點（釜山 Pass）</summary>
     <div id="backupList"></div>
+  </details>
+</section>
+
+<!-- WISH -->
+<section id="wish">
+  <h2><span class="dot" style="background:var(--coral)">♥</span>想吃想買清單</h2>
+  <p class="sub">Threads 推薦的店家。還沒排進行程，點「想去」可標記，點 Naver Map 直接開地圖。</p>
+  <div id="wishPick"></div>
+  <details class="card" id="wishGuide">
+    <summary>3 大地區攻略（西面・南浦・海雲台）</summary>
+    <div id="wishGuideList"></div>
   </details>
 </section>
 
@@ -1098,6 +1121,68 @@ const DATA = {
 };
 /*DATA:END*/
 
+/*WISH:START*/
+const WISH = {
+ "pick": [
+  {"id":"gojip","n":"고짚 일광점（Gojip 日光店）","cat":"美食","area":"機張・日光","ko":"고짚 일광점","gm":"https://maps.app.goo.gl/W2ZMwYvCZGcnuH4J6",
+   "note":"主打韓式牛肋排（우대갈비），店員會幫忙烤，不用自己動手。五花肉也被大推，吃的時候搭醃野蒜葉（명이나물）或泡菜。",
+   "sug":"11/20 Skyline Luge 就在機張一帶，玩完可以順路吃。要排進去的話，原本的「海雲台晚餐」可以換掉。",
+   "warn":"價格與營業時間貼文沒寫，出發前到 Naver Map 確認。"},
+  {"id":"pork","n":"돼지나무 사랑걸렸네 西面本店（大蔥豬橫膈膜肉）","cat":"美食","area":"西面","ko":"돼지나무 사랑걸렸네 서면 본점","nv":"https://naver.me/xD8fjtZG","addr":"부산 부산진구 중앙대로756번길 16 1층",
+   "note":"大蔥搭油脂豐富的橫膈膜豬肉，可以配不同醬料，貼文最推明太子醬。吃完可跟店家要梅子茶解膩。",
+   "sug":"建議平日去。11/18～11/20 都是平日，11/21 是週六、而且醫美後要吃清淡。",
+   "warn":"貼文說週末不能線上預約，現場抽號碼牌等了一個多小時。地瓜冰淇淋當天賣光，不一定吃得到。"},
+  {"id":"ahee","n":"AHEE 棉被店（貼文寫 AHEE EDDING SHOP）","cat":"購物","area":"南浦洞","ko":"AHEE BEDDING 남포동",
+   "note":"11 月剛開幕的棉被店。貼文說老闆誠實、價格實在、檔期有折扣會主動告知、不強迫推銷。老闆在新東亞市場 85、87 號也有海鮮攤位，貼文說價格划算。",
+   "sug":"11/19 札嘎其市場午餐時，可以順路去新東亞市場 85、87 號吃海鮮，再逛這家店。",
+   "warn":"店名拼法待確認（貼文寫 EDDING，疑似 BEDDING）。棉被很占行李空間，回程 KE2085 的託運額度出發前先確認。"},
+  {"id":"artbox","n":"ARTBOX（文具雜貨）","cat":"購物","area":"釜山多處分店","ko":"아트박스 부산",
+   "note":"貼文說來釜山每天都會進去逛，東西可愛又便宜。",
+   "sug":"11/18 逛西面時順路去最方便。",
+   "warn":"貼文沒寫是哪一間分店，用 Naver Map 搜尋離你最近的。"}
+ ],
+ "guide": [
+  {"area":"西面","tip":"換錢：老奶奶／WowPas","items":[
+   {"n":"西面地下街","t":"景點","ko":"서면지하상가"},
+   {"n":"田浦咖啡街","t":"景點","ko":"전포카페거리"},
+   {"n":"青春街","t":"景點"},
+   {"n":"味贊王鹽烤肉","t":"美食","ko":"맛찬들왕소금구이 서면"},
+   {"n":"松亭 3 代豬肉湯飯","t":"美食","ko":"송정3대국밥 서면"},
+   {"n":"螞蟻家辣炒章魚","t":"美食","ko":"개미집 서면"},
+   {"n":"釜田市場豬肉湯飯一條街","t":"美食","ko":"서면 돼지국밥 골목"},
+   {"n":"小熊奶油蛋糕","t":"甜點"},
+   {"n":"番茄羅勒冰淇淋","t":"甜點"},
+   {"n":"Diart 手沖","t":"甜點"}]},
+  {"area":"南浦","items":[
+   {"n":"甘川洞","t":"景點","plan":"11/19"},
+   {"n":"松島纜車","t":"景點","plan":"11/19"},
+   {"n":"天空步道","t":"景點"},
+   {"n":"白淺灘村","t":"景點","ko":"흰여울문화마을"},
+   {"n":"札嘎其市場","t":"景點","plan":"11/19"},
+   {"n":"國際市場","t":"景點","ko":"국제시장"},
+   {"n":"龍頭山釜山塔","t":"景點","plan":"11/19"},
+   {"n":"札嘎其現撈海鮮","t":"美食","plan":"11/19"},
+   {"n":"南浦雪濃湯","t":"美食"},
+   {"n":"南浦豬腳街","t":"美食","ko":"부평족발골목"},
+   {"n":"富平罐頭市場韭菜煎餅","t":"美食","ko":"부평깡통시장"},
+   {"n":"昇基堅果黑糖餅","t":"甜點","ko":"승기호떡"}]},
+  {"area":"海雲台","items":[
+   {"n":"Busan X the SKY","t":"景點","plan":"11/20"},
+   {"n":"天空膠囊列車","t":"景點","plan":"11/20"},
+   {"n":"海岸列車","t":"景點","plan":"11/20"},
+   {"n":"青沙浦踏石展望台","t":"景點","plan":"11/20"},
+   {"n":"The Bay 101","t":"景點","ko":"더베이101"},
+   {"n":"密陽血腸豬肉湯飯","t":"美食"},
+   {"n":"伍班長起司烤肉","t":"美食"},
+   {"n":"大海鮑魚粥","t":"美食"},
+   {"n":"1 號貝殼店烤扇貝鍋","t":"美食"},
+   {"n":"Waveon Coffee","t":"甜點","ko":"웨이브온 청사포"},
+   {"n":"膠囊列車咖啡","t":"甜點"},
+   {"n":"奶油餅乾","t":"甜點"}]}
+ ]
+};
+/*WISH:END*/
+
 const $ = s => document.querySelector(s);
 const fmt = n => Math.round(n).toLocaleString('en-US');
 const twd = k => Math.round(k / RATE);
@@ -1285,12 +1370,42 @@ function renderStays(){
   </article>`}).join('');
 }
 
+const K_WISH = 'busan-trip-wish-v1';
+let favs = new Set(safeGet(K_WISH)||[]);
+function saveFavs(){ safeSet(K_WISH, [...favs]); }
+function favBtn(id){ const on = favs.has(id); return `<button class="btn fav" type="button" data-fav="${esc(id)}" aria-pressed="${on}">${on?'★ 想去':'☆ 想去'}</button>`; }
+function renderWish(){
+  $('#wishPick').innerHTML = WISH.pick.map(w=>{
+    const href = w.nv || navUrl(w.ko);
+    return `<article class="card wish">
+      <div class="area"><span class="chip">${esc(w.cat)}</span> <span class="chip">${esc(w.area)}</span></div>
+      <h3>${esc(w.n)}</h3>
+      <p class="desc">${esc(w.note)}</p>
+      ${w.addr?`<p class="hint">${esc(w.addr)}</p>`:''}
+      ${w.sug?`<div class="sug">💡 ${esc(w.sug)}</div>`:''}
+      ${w.warn?`<p class="warn">⚠ ${esc(w.warn)}</p>`:''}
+      <div class="btnrow"><a class="btn" style="background:var(--green)" href="${esc(href)}" target="_blank" rel="noopener">📍 Naver Map</a>${w.gm?`<a class="btn" style="background:var(--blue)" href="${esc(w.gm)}" target="_blank" rel="noopener">Google Maps</a>`:''}${favBtn(w.id)}</div>
+    </article>`;}).join('');
+  $('#wishGuideList').innerHTML = WISH.guide.map((g,gi)=>`
+    <h3 style="margin:14px 0 0;font-size:17px">${esc(g.area)}</h3>
+    ${g.tip?`<p class="hint">${esc(g.tip)}</p>`:''}
+    <ul class="wlist">${g.items.map((x,i)=>{ const id='g'+gi+'-'+i; return `<li>
+      <span class="wn">${esc(x.n)}<small>${esc(x.t)}${x.plan?'・已排入 '+esc(x.plan)+' 行程':''}${!x.ko&&!x.plan?'・韓文店名待確認':''}</small></span>
+      ${x.ko?`<a class="map" style="margin:0" href="${navUrl(x.ko)}" target="_blank" rel="noopener">📍 地圖</a>`:''}
+      ${x.plan?'':favBtn(id)}
+    </li>`;}).join('')}</ul>`).join('');
+}
 function renderAll(){
   renderHero(); renderFlights(); renderTabs(); renderDay(false);
-  renderBackups(); renderPass(); renderCost(); renderTodo(); renderStays(); tick();
+  renderWish(); renderBackups(); renderPass(); renderCost(); renderTodo(); renderStays(); tick();
 }
 
 /* ---------- 事件（只綁一次） ---------- */
+document.addEventListener('click',e=>{
+  const b = e.target.closest('[data-fav]'); if(!b) return;
+  const id = b.dataset.fav; favs.has(id) ? favs.delete(id) : favs.add(id); saveFavs();
+  b.setAttribute('aria-pressed', favs.has(id)); b.textContent = favs.has(id) ? '★ 想去' : '☆ 想去';
+});
 $('#tabs').addEventListener('click',e=>{
   const b = e.target.closest('.tab'); if(!b) return;
   cur = +b.dataset.i; renderTabs(); renderDay(true);
